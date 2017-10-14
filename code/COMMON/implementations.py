@@ -1,5 +1,5 @@
 import numpy as np
-import costs
+from costs import *
 
 def least_squares(y, tx):
     """calculate the least squares."""
