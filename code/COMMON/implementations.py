@@ -19,7 +19,6 @@ def ridge_regression(y, tx, lambda_):
     return w_rr, loss
 
 def compute_gradient(y, tx, w):
-
     """Compute the gradient."""
 
     # number of samples
@@ -59,7 +58,6 @@ def batch_iter(y, tx, batch_size, num_batches=1, shuffle=True):
             yield shuffled_y[start_index:end_index], shuffled_tx[start_index:end_index]
 
 def least_squares_GD(y, tx, initial_w, max_iters, gamma):
-
     """Gradient descent algorithm."""
     
     # define parameters to store w and loss
@@ -85,7 +83,6 @@ def least_squares_GD(y, tx, initial_w, max_iters, gamma):
     return ws, losses
     
 def least_squares_SGD(y, tx, initial_w, max_iters, gamma):
-    
     """Stochastic gradient descent algorithm."""
     
     # Define parameters to store w and loss

@@ -16,8 +16,7 @@ def compute_mse(y, tx, w):
     return mse
 
 def compute_mae(y, tx, w):
-    """Calculate the loss using mae.
-    """
+    """Calculate the loss using mae."""
    
     # number of samples
     N = len(y)
