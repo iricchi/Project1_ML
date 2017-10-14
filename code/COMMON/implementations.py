@@ -98,18 +98,18 @@ def least_squares_SGD(y, tx, initial_w, max_iters, gamma):
                 
         # pick randomly 'batch_size' samples
         batches = batch_iter(y, tx, 1, num_batches=1, shuffle=True)
-        
+
         for samples in batches:
 
             # read samples
-            y = samples[0]
-            tx = samples[1]
+            y_tmp = samples[0]
+            tx_tmp = samples[1]
         
             # compute new parameters
-            w = ws[-1] - gamma*compute_gradient(y, tx, ws[-1])
+            w = ws[-1] - gamma*compute_gradient(y_tmp, tx_tmp, ws[-1])
             
             # get new loss
-            loss = compute_mse(y, tx, ws[-1])        
+            loss = compute_mse(y_tmp, tx_tmp, ws[-1])        
         
         # store w and loss
         ws.append(w)
