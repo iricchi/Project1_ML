@@ -1,5 +1,14 @@
 # -*- coding: utf-8 -*-
 
+# add path
+import sys
+my_path = r'D:\Documents\etudes\epfl\MA1\cours\MachineLearning\Project1'
+sys.path.insert(0,my_path + r'\code\COMMON')
+
+# import modules
+import numpy as np
+from costs import *
+
 def compute_gradient(y, tx, w):
 
     """Compute the gradient."""
@@ -45,7 +54,7 @@ def least_squares_GD(y, tx, initial_w, max_iters, gamma):
     
 def least_squares_SGD(y, tx, initial_w, max_iters, gamma):
     
-     """Stochastic gradient descent algorithm."""
+    """Stochastic gradient descent algorithm."""
     
     # Define parameters to store w and loss
     ws = [initial_w]
@@ -65,7 +74,7 @@ def least_squares_SGD(y, tx, initial_w, max_iters, gamma):
             tx = samples[1]
         
             # compute new parameters
-            w = ws[-1] - gamma*compute_stoch_gradient(y, tx, ws[-1])
+            w = ws[-1] - gamma*compute_gradient(y, tx, ws[-1])
             
             # get new loss
             loss = compute_mse(y, tx, ws[-1])        
