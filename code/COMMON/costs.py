@@ -2,8 +2,7 @@
 """Functions used to compute the loss."""
 
 def compute_mse(y, tx, w):
-    """Calculate the loss using mse.
-    """
+    """Calculate the loss using mse."""
    
     # number of samples
     N = len(y)
