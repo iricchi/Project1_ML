@@ -141,3 +141,34 @@ def cross_validation_degree(y, x, lambda_, degree_min, degree_max, k_fold):
     cross_validation_visualization(degrees, rmse_tr, rmse_te)
     
     return degree_opt
+
+from plots import cross_validation_visualization
+
+def cross_validation_var_rmse(lambda_, degree, k_fold):
+    
+    # split data in k fold
+    seed = 1
+    k_indices = build_k_indices(y, k_fold, seed)
+    
+    # define lists to store the loss of training data and test data
+    rmse_tr_all = []
+    rmse_te_all = []
+         
+    for k in range(k_fold):        
+        
+        # compute losses for the k'th fold
+        rmse_tr_tmp, rmse_te_tmp = cross_validation(y, x, k_indices, k, lambda_, degree)
+
+        # store losses 
+        rmse_tr_all.append(rmse_tr_tmp)
+        rmse_te_all.append(rmse_te_tmp)
+        
+    # store mean losses
+    std_rmse_tr = np.std(rmse_tr_all)
+    std_rmse_te = np.std(rmse_te_all)
+    
+    # boxplot of the training and testing rmse
+    plt.figure()
+    plt.boxplot(np.column_stack((np.array(rmse_tr_all), np.array(rmse_te_all))), labels=['training rmse','testing rmse'])
+    
+    return std_rmse_tr, std_rmse_te
