@@ -1,3 +1,15 @@
+def cross_validation_visualization(lambds, mse_tr, mse_te):
+    """visualization the curves of mse_tr and mse_te."""
+    
+    plt.semilogx(lambds, mse_tr, marker=".", color='b', label='train error')
+    plt.semilogx(lambds, mse_te, marker=".", color='r', label='test error')
+    plt.xlabel("lambda")
+    plt.ylabel("rmse")
+    plt.title("cross validation")
+    plt.legend(loc=2)
+    plt.grid(True)
+    plt.savefig("cross_validation")
+    
 def build_k_indices(y, k_fold, seed):
     """build k indices for k-fold."""
     
@@ -45,20 +57,8 @@ def cross_validation(y, x, k_indices, k, lambda_, degree):
     rmse_te = np.sqrt(2*compute_mse(y_te, phi_te, w_tr))
 
     return rmse_tr, rmse_te
-
-def cross_validation_visualization(lambds, mse_tr, mse_te):
-    """visualization the curves of mse_tr and mse_te."""
     
-    plt.semilogx(lambds, mse_tr, marker=".", color='b', label='train error')
-    plt.semilogx(lambds, mse_te, marker=".", color='r', label='test error')
-    plt.xlabel("lambda")
-    plt.ylabel("rmse")
-    plt.title("cross validation")
-    plt.legend(loc=2)
-    plt.grid(True)
-    plt.savefig("cross_validation")
-    
-def cross_validation_lambda(degree, lambda_min, lambda_max, lambda_steps, k_fold, seed_split_data):
+def cross_validation_lambda(y, x, degree, lambda_min, lambda_max, lambda_steps, k_fold, seed_split_data):
     """ Given a degree for the regression it finds the optimal lambda in the log interval [lambda_min, lambda_max]
     thanks to cross   validation on 'k_folds' different training/testing sets. """
         
@@ -98,7 +98,7 @@ def cross_validation_lambda(degree, lambda_min, lambda_max, lambda_steps, k_fold
     
     return lambda_opt
 
-def cross_validation_degree(lambda_, degree_min, degree_max, k_fold):
+def cross_validation_degree(y, x, lambda_, degree_min, degree_max, k_fold):
     """ Given a degree for the regression it finds the optimal degree in the log interval [degree_min, degree_max]
     thanks to cross   validation on 'k_folds' different training/testing sets. """
         
