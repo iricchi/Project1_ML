@@ -3,7 +3,8 @@ import matplotlib.pyplot as plt
 from build_poly import build_poly
 from plots import *
 from implementations import *
-    
+from proj1_helpers import predict_labels
+
 def build_k_indices(y, k_fold, seed):
     """build k indices for k-fold."""
     
@@ -133,7 +134,7 @@ def cross_validation_degree_ridge_regression(y, x, lambda_, degree_min, degree_m
     
     return degree_opt, rmse_tr, rmse_te
 
-def cross_validation_var_rmse_ridge_regression(lambda_, degree, k_fold):
+def cross_validation_rmse_ridge_regression(y, x, lambda_, degree, k_fold):
     
     # split data in k fold
     seed = 1
@@ -152,7 +153,11 @@ def cross_validation_var_rmse_ridge_regression(lambda_, degree, k_fold):
         rmse_tr_all.append(rmse_tr_tmp)
         rmse_te_all.append(rmse_te_tmp)
         
-    # store mean losses
+    # std of the losses
+    mean_rmse_tr = np.mean(rmse_tr_all)
+    mean_rmse_te = np.mean(rmse_te_all)
+    
+    # std of the losses
     std_rmse_tr = np.std(rmse_tr_all)
     std_rmse_te = np.std(rmse_te_all)
     
@@ -160,4 +165,43 @@ def cross_validation_var_rmse_ridge_regression(lambda_, degree, k_fold):
     plt.figure()
     plt.boxplot(np.column_stack((np.array(rmse_tr_all), np.array(rmse_te_all))), labels=['training rmse','testing rmse'])
     
-    return std_rmse_tr, std_rmse_te
+    return mean_rmse_tr, mean_rmse_te, std_rmse_tr, std_rmse_te
+
+def cross_validation_classification_ridge_regression(y, x, lambda_, degree, k_fold):
+    
+    # split data in k fold
+    seed = 1
+    k_indices = build_k_indices(y, k_fold, seed)
+    
+    # classification errors obtained after prediction on the testing set
+    classification_errors = []
+         
+    for k in range(k_fold):        
+        
+        # get k'th subgroup in test, others in train
+        x_te = x[k_indices[k,:],:]
+        y_te = y[k_indices[k,:]]
+        x_tr = x[np.union1d(k_indices[:k,:], k_indices[k+1:,:]),:]
+        y_tr = y[np.union1d(k_indices[:k,:], k_indices[k+1:,:])]
+
+        # build data with polynomial degree
+        phi_te = build_poly(x_te, degree)
+        phi_tr = build_poly(x_tr, degree)
+
+        # ridge regression
+        w_tr, loss_tr = ridge_regression(y_tr, phi_tr, lambda_)
+        
+        # predict
+        y_pred = predict_labels(w_tr, phi_te)
+
+        # classification error
+        classification_error = len(np.argwhere(y_te-y_pred))/len(y_te)*100
+
+        # store
+        classification_errors.append(classification_error)
+        
+    # mean and std
+    mean_classification_error = np.mean(classification_errors)
+    std_classification_error = np.std(classification_errors)
+    
+    return mean_classification_error, std_classification_error
