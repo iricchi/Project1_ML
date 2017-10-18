@@ -1,3 +1,6 @@
+import numpy as np
+import matplotlib.pyplot as plt
+
 def cross_validation_visualization(lambds, mse_tr, mse_te):
     """visualization the curves of mse_tr and mse_te."""
     
