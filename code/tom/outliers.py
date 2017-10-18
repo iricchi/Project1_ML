@@ -13,12 +13,15 @@ def handle_outliers(input_data, yb, outlier_value, delete):
         
     else:
         for i in range(input_data.shape[1]):
+            
             X = np.delete(X, np.where(X[:,i] == outlier_value), 0)
 
         means = np.mean(X, axis=0)
 
         for i in range(input_data.shape[1]):
+            
             input_data[np.where(input_data[:,i]== outlier_value),i] = means[i]
+            
         X = input_data
         Y = yb
         
