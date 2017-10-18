@@ -8,6 +8,8 @@
    },
    "outputs": [],
    "source": [
+    "import numpy as np\n",
+    "\n",
     "def build_poly(x, degree):\n",
     "    \"\"\"polynomial basis functions for input data x, for j=0 up to j=degree.\"\"\"\n",
     "    \n",
@@ -41,7 +43,7 @@
    "name": "python",
    "nbconvert_exporter": "python",
    "pygments_lexer": "ipython3",
-   "version": "3.6.2"
+   "version": "3.6.1"
   }
  },
  "nbformat": 4,
