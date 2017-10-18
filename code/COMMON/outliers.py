@@ -5,7 +5,7 @@ Set delete to 1 if you want to delete -999 from the dataset,
 Set delete to 0 if you want to substitude -999 with 0,
 Set delete to anyother values if you want to substitude -999 with the mean
 """
-def handle_outliers(input_data, yb, outlier_value, delete)
+def handle_outliers(input_data, yb, outlier_value, delete):
     X = input_data
 
     if delete==1:
