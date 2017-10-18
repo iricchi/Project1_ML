@@ -1,18 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from build_poly import build_poly
-
-def cross_validation_visualization(lambds, mse_tr, mse_te):
-    """visualization the curves of mse_tr and mse_te."""
-    
-    plt.semilogx(lambds, mse_tr, marker=".", color='b', label='train error')
-    plt.semilogx(lambds, mse_te, marker=".", color='r', label='test error')
-    plt.xlabel("lambda")
-    plt.ylabel("rmse")
-    plt.title("cross validation")
-    plt.legend(loc=2)
-    plt.grid(True)
-    plt.savefig("cross_validation")
+from plots import *
+from implementations import *
     
 def build_k_indices(y, k_fold, seed):
     """build k indices for k-fold."""
@@ -44,9 +34,9 @@ def cross_validation_ridge_regression(y, x, k_indices, k, lambda_, degree):
         degree : degree of the basis polynomial fonction used for the regression."""
     
     # get k'th subgroup in test, others in train
-    x_te = x[k_indices[k,:]]
+    x_te = x[k_indices[k,:],:]
     y_te = y[k_indices[k,:]]
-    x_tr = x[np.union1d(k_indices[:k,:], k_indices[k+1:,:])]
+    x_tr = x[np.union1d(k_indices[:k,:], k_indices[k+1:,:]),:]
     y_tr = y[np.union1d(k_indices[:k,:], k_indices[k+1:,:])]
 
     # build data with polynomial degree
@@ -54,7 +44,7 @@ def cross_validation_ridge_regression(y, x, k_indices, k, lambda_, degree):
     phi_tr = build_poly(x_tr, degree)
         
     # ridge regression
-    w_tr = ridge_regression(y_tr, phi_tr, lambda_)
+    w_tr, loss_tr = ridge_regression(y_tr, phi_tr, lambda_)
     
     # calculate the loss for train and test data
     rmse_tr = np.sqrt(2*compute_mse(y_tr, phi_tr, w_tr))
@@ -98,9 +88,9 @@ def cross_validation_lambda_ridge_regression(y, x, degree, lambda_min, lambda_ma
     lambda_opt = lambdas[rmse_te.index(min(rmse_te))]
     
     # plot the training and testing errors for the different values of lambda
-    cross_validation_visualization(lambdas, rmse_tr, rmse_te)
+    cross_validation_visualization_lambda(lambdas, rmse_tr, rmse_te)
     
-    return lambda_opt
+    return lambda_opt, rmse_tr, rmse_te
 
 def cross_validation_degree_ridge_regression(y, x, lambda_, degree_min, degree_max, k_fold):
     """ Given a degree for the regression it finds the optimal degree in the log interval [degree_min, degree_max]
@@ -139,11 +129,9 @@ def cross_validation_degree_ridge_regression(y, x, lambda_, degree_min, degree_m
     degree_opt = degrees[rmse_te.index(min(rmse_te))]
     
     # plot the training and testing errors for the different degrees
-    cross_validation_visualization(degrees, rmse_tr, rmse_te)
+    cross_validation_visualization_degree(degrees, rmse_tr, rmse_te)
     
-    return degree_opt
-
-from plots import cross_validation_visualization
+    return degree_opt, rmse_tr, rmse_te
 
 def cross_validation_var_rmse_ridge_regression(lambda_, degree, k_fold):
     
