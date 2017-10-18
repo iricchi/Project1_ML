@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from Build_Poly import build_poly
+from build_poly import build_poly
 
 def cross_validation_visualization(lambds, mse_tr, mse_te):
     """visualization the curves of mse_tr and mse_te."""
