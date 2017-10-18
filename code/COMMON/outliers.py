@@ -16,8 +16,11 @@ def handle_outliers(input_data, yb, outlier_value, delete):
             Y = np.delete(Y, del_idx, 0)
         
     elif delete==0:
+        Y = yb
         for i in range(X.shape[1]):
             X[np.where(X[:,i]==-999),i] = 0
+        
+        
 
         
     else:
