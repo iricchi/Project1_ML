@@ -68,25 +68,3 @@ def batch_iter(y, tx, batch_size, num_batches=1, shuffle=True):
         end_index = min((batch_num + 1) * batch_size, data_size)
         if start_index != end_index:
             yield shuffled_y[start_index:end_index], shuffled_tx[start_index:end_index]
-
-def build_k_indices(y, k_fold, seed):
-    """build k indices for k-fold."""
-    
-    # number of samples in total
-    num_row = y.shape[0]
-    
-    # number of samples per fold
-    interval = int(num_row / k_fold)
-    
-    # set the seed
-    np.random.seed(seed) 
-    
-    # get indices
-    indices = np.random.permutation(num_row)
-    k_indices = [indices[k * interval: (k + 1) * interval]
-                 for k in range(k_fold)]
-    
-    print("Number of samples in total: ", y.shape[0])
-    print("Number of folds: ",k_fold, " of", interval, "samples.")
-    
-    return np.array(k_indices)
