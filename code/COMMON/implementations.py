@@ -1,5 +1,6 @@
 import numpy as np
 from costs import *
+from compute_gradient import compute_gradient
 
 def least_squares(y, tx):
     """calculate the least squares."""
@@ -9,7 +10,6 @@ def least_squares(y, tx):
     
     return w, loss
 
-
 def ridge_regression(y, tx, lambda_):
     """implement ridge regression."""    
     w_rr = np.linalg.solve(tx.T.dot(tx) + lambda_*np.identity(tx.shape[1]) , (tx.T).dot(y))
@@ -17,45 +17,6 @@ def ridge_regression(y, tx, lambda_):
     loss = compute_mse(y, tx, w_rr);
     
     return w_rr, loss
-
-def compute_gradient(y, tx, w):
-    """Compute the gradient."""
-
-    # number of samples
-    N = len(y)
-
-    # compute the vector of the errors
-    e = y-tx.dot(w)
-
-    # compute the gradient
-    grad = -(1/N)*tx.T.dot(e)
-
-    return grad
-
-def batch_iter(y, tx, batch_size, num_batches=1, shuffle=True):
-    """
-    Generate a minibatch iterator for a dataset.
-    Takes as input two iterables (here the output desired values 'y' and the input data 'tx')
-    Outputs an iterator which gives mini-batches of `batch_size` matching elements from `y` and `tx`.
-    Data can be randomly shuffled to avoid ordering in the original data messing with the randomness of the minibatches.
-    Example of use :
-    for minibatch_y, minibatch_tx in batch_iter(y, tx, 32):
-        <DO-SOMETHING>
-    """
-    data_size = len(y)
-
-    if shuffle:
-        shuffle_indices = np.random.permutation(np.arange(data_size))
-        shuffled_y = y[shuffle_indices]
-        shuffled_tx = tx[shuffle_indices]
-    else:
-        shuffled_y = y
-        shuffled_tx = tx
-    for batch_num in range(num_batches):
-        start_index = batch_num * batch_size
-        end_index = min((batch_num + 1) * batch_size, data_size)
-        if start_index != end_index:
-            yield shuffled_y[start_index:end_index], shuffled_tx[start_index:end_index]
 
 def least_squares_GD(y, tx, initial_w, max_iters, gamma):
     """Gradient descent algorithm."""
@@ -115,28 +76,6 @@ def least_squares_SGD(y, tx, initial_w, max_iters, gamma):
     print("Gradient Descent({bi}/{ti}): loss MSE={l}, w0={w0}, w1={w1}".format(bi=n_iter, ti=max_iters - 1, l=loss, w0=w[0], w1=w[1]))
 
     return ws, losses
-
-def build_k_indices(y, k_fold, seed):
-    """build k indices for k-fold."""
-    
-    # number of samples in total
-    num_row = y.shape[0]
-    
-    # number of samples per fold
-    interval = int(num_row / k_fold)
-    
-    # set the seed
-    np.random.seed(seed) 
-    
-    # get indices
-    indices = np.random.permutation(num_row)
-    k_indices = [indices[k * interval: (k + 1) * interval]
-                 for k in range(k_fold)]
-    
-    print("Number of samples in total: ", y.shape[0])
-    print("Number of folds: ",k_fold, " of", interval, "samples.")
-    
-    return np.array(k_indices)
 
 def cross_validation(y, x, k_indices, k, lambda_, degree):
     """Return the training and testing losses (rmse) for RIDGE REGRESSION. The training is done on the kth subfold. 
