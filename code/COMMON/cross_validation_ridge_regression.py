@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from Build_Poly import build_poly
 
 def cross_validation_visualization(lambds, mse_tr, mse_te):
     """visualization the curves of mse_tr and mse_te."""
@@ -35,7 +36,7 @@ def build_k_indices(y, k_fold, seed):
     
     return np.array(k_indices)
 
-def cross_validation(y, x, k_indices, k, lambda_, degree):
+def cross_validation_ridge_regression(y, x, k_indices, k, lambda_, degree):
     """Return the training and testing losses (rmse) for RIDGE REGRESSION. The training is done on the kth subfold. 
         (x,y) : input data used for the regression.
         k     : kth subgroup to test (others are used for the training) 
@@ -61,7 +62,7 @@ def cross_validation(y, x, k_indices, k, lambda_, degree):
 
     return rmse_tr, rmse_te
     
-def cross_validation_lambda(y, x, degree, lambda_min, lambda_max, lambda_steps, k_fold, seed_split_data):
+def cross_validation_lambda_ridge_regression(y, x, degree, lambda_min, lambda_max, lambda_steps, k_fold, seed_split_data):
     """ Given a degree for the regression it finds the optimal lambda in the log interval [lambda_min, lambda_max]
     thanks to cross   validation on 'k_folds' different training/testing sets. """
         
@@ -83,7 +84,7 @@ def cross_validation_lambda(y, x, degree, lambda_min, lambda_max, lambda_steps, 
         for k in range(k_fold):        
         
             # compute losses for the k'th fold
-            rmse_tr_tmp, rmse_te_tmp = cross_validation(y, x, k_indices, k, lambda_, degree)
+            rmse_tr_tmp, rmse_te_tmp = cross_validation_ridge_regression(y, x, k_indices, k, lambda_, degree)
 
             # store losses 
             rmse_tr_all.append(rmse_tr_tmp)
@@ -101,7 +102,7 @@ def cross_validation_lambda(y, x, degree, lambda_min, lambda_max, lambda_steps, 
     
     return lambda_opt
 
-def cross_validation_degree(y, x, lambda_, degree_min, degree_max, k_fold):
+def cross_validation_degree_ridge_regression(y, x, lambda_, degree_min, degree_max, k_fold):
     """ Given a degree for the regression it finds the optimal degree in the log interval [degree_min, degree_max]
     thanks to cross   validation on 'k_folds' different training/testing sets. """
         
@@ -124,7 +125,7 @@ def cross_validation_degree(y, x, lambda_, degree_min, degree_max, k_fold):
         for k in range(k_fold):        
         
             # compute losses for the k'th fold
-            rmse_tr_tmp, rmse_te_tmp = cross_validation(y, x, k_indices, k, lambda_, degree)
+            rmse_tr_tmp, rmse_te_tmp = cross_validation_ridge_regression(y, x, k_indices, k, lambda_, degree)
 
             # store losses 
             rmse_tr_all.append(rmse_tr_tmp)
@@ -144,7 +145,7 @@ def cross_validation_degree(y, x, lambda_, degree_min, degree_max, k_fold):
 
 from plots import cross_validation_visualization
 
-def cross_validation_var_rmse(lambda_, degree, k_fold):
+def cross_validation_var_rmse_ridge_regression(lambda_, degree, k_fold):
     
     # split data in k fold
     seed = 1
@@ -157,7 +158,7 @@ def cross_validation_var_rmse(lambda_, degree, k_fold):
     for k in range(k_fold):        
         
         # compute losses for the k'th fold
-        rmse_tr_tmp, rmse_te_tmp = cross_validation(y, x, k_indices, k, lambda_, degree)
+        rmse_tr_tmp, rmse_te_tmp = cross_validation_ridge_regression(y, x, k_indices, k, lambda_, degree)
 
         # store losses 
         rmse_tr_all.append(rmse_tr_tmp)
