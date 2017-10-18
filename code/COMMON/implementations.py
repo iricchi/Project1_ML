@@ -177,9 +177,9 @@ def cross_validation_visualization(lambds, mse_tr, mse_te):
     plt.savefig("cross_validation")
     
 def cross_validation_lambda(degree, lambda_min, lambda_max, lambda_steps, k_fold, seed_split_data):
-    """ Given a degree for the regression it finds the optimal lambda in the log interval [lambda_min, lambda_max] thanks to cross validation on 'k_folds' different training/testing sets. 
-    """
-    
+    """ Given a degree for the regression it finds the optimal lambda in the log interval [lambda_min, lambda_max]
+    thanks to cross   validation on 'k_folds' different training/testing sets. """
+        
     # tested lambdas
     lambdas = np.logspace(lambda_min, lambda_max, lambda_steps)
     
@@ -217,8 +217,8 @@ def cross_validation_lambda(degree, lambda_min, lambda_max, lambda_steps, k_fold
     return lambda_opt
 
 def cross_validation_degree(lambda_, degree_min, degree_max, k_fold):
-        """Given a lambda for the regression it finds the optimal degree in the interval [degree_min, degree_max] thanks to cross validation on 'k_folds' different training/testing sets. 
-    """
+    """ Given a degree for the regression it finds the optimal degree in the log interval [degree_min, degree_max]
+    thanks to cross   validation on 'k_folds' different training/testing sets. """
         
     # tested degrees
     degrees = np.arange(degree_min, degree_max+1)
