@@ -1,12 +1,6 @@
 # -*- coding: utf-8 -*-
-"""Exercise 3.
-
-Split the dataset based on the given ratio.
-"""
-
 
 import numpy as np
-
 
 def split_data(x, y, ratio, seed=1):
     """
