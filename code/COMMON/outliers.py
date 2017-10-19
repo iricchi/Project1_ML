@@ -14,7 +14,6 @@ def handle_outliers(input_data, yb, outlier_value, delete):
         
         print('samples with -999 are removed from the dataset ')
         
-        # labels are unchanged
         Y = yb
         
         for i in range(input_data.shape[1]):
@@ -36,12 +35,14 @@ def handle_outliers(input_data, yb, outlier_value, delete):
         
         print('-999 are replaced by the mean value of the feature')
 
+        # labels are unchanged
         Y = yb
 
+        # get the feature medians
+        X_tmp = X
         for i in range(input_data.shape[1]):
-            X = np.delete(X, np.where(X[:,i] == outlier_value), 0)
-
-        means = np.mean(X, axis=0)
+            X_tmp = np.delete(X_tmp, np.where(X_tmp[:,i] == outlier_value), 0)
+        means = np.mean(X_tmp, axis=0)
 
         for i in range(input_data.shape[1]):
             X[np.where(input_data[:,i]== outlier_value),i] = means[i]
@@ -53,10 +54,11 @@ def handle_outliers(input_data, yb, outlier_value, delete):
         # labels are unchanged
         Y = yb 
 
+        # get the feature medians
+        X_tmp = X
         for i in range(input_data.shape[1]):
-            X = np.delete(X, np.where(X[:,i] == outlier_value), 0)
-
-        medians = np.median(X, axis=0)
+            X_tmp = np.delete(X_tmp, np.where(X_tmp[:,i] == outlier_value), 0)
+        medians = np.median(X_tmp, axis=0)
 
         for i in range(input_data.shape[1]):
             X[np.where(input_data[:,i]== outlier_value),i] = medians[i]
