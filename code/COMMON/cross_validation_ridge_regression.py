@@ -135,7 +135,12 @@ def cross_validation_degree_ridge_regression(y, x, lambda_, degree_min, degree_m
     return degree_opt, rmse_tr, rmse_te
 
 def cross_validation_rmse_ridge_regression(y, x, lambda_, degree, k_fold):
+    """ Giving a linear model it estimates the training and testing errors (rmse) with cross validation. 
     
+    The model used is a linear model with a polynomial basis of degree 'degree' gave through ridge regression 
+    whose penalized parameter is 'lambda_'.
+    """
+   
     # split data in k fold
     seed = 1
     k_indices = build_k_indices(y, k_fold, seed)
@@ -168,14 +173,20 @@ def cross_validation_rmse_ridge_regression(y, x, lambda_, degree, k_fold):
     return mean_rmse_tr, mean_rmse_te, std_rmse_tr, std_rmse_te
 
 def cross_validation_classification_ridge_regression(y, x, lambda_, degree, k_fold):
+    """ Giving a linear model it estimates the classification error and the class error (rmse) with cross validation. 
     
+    The model used is a linear model with a polynomial basis of degree 'degree' gave through ridge regression 
+    whose penalized parameter is 'lambda_'.
+    """
+        
     # split data in k fold
     seed = 1
     k_indices = build_k_indices(y, k_fold, seed)
     
-    # classification errors obtained after prediction on the testing set
+    # class errors and classification errors obtained after prediction on the testing set
     classification_errors = []
-         
+    class_errors = []
+
     for k in range(k_fold):        
         
         # get k'th subgroup in test, others in train
@@ -197,11 +208,19 @@ def cross_validation_classification_ridge_regression(y, x, lambda_, degree, k_fo
         # classification error
         classification_error = len(np.argwhere(y_te-y_pred))/len(y_te)*100
 
+        # class error 
+        class_error_background = len(np.where(np.logical_and(y_te==-1, y_pred==-1))[0])
+        class_error_signal = len(np.where(np.logical_and(y_te==1, y_pred==1))[0])
+        class_error = class_error_background/len(np.where(y_te==-1)[0]) + class_error_signal/len(np.where(y_te==1)[0])
+        
         # store
         classification_errors.append(classification_error)
-        
+        class_errors.append(class_error)
+
     # mean and std
     mean_classification_error = np.mean(classification_errors)
     std_classification_error = np.std(classification_errors)
+    mean_class_error = np.mean(class_errors)
+    std_class_error = np.std(class_errors)
     
-    return mean_classification_error, std_classification_error
+    return mean_classification_error, std_classification_error, mean_class_error, std_class_error
