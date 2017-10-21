@@ -1,60 +1,65 @@
 import numpy as np
 from costs import *
-from compute_gradient import compute_gradient
+from compute_gradient import *
+from proj1_helpers import batch_iter
 
 def least_squares(y, tx):
-    """calculate the least squares."""
-    w = np.linalg.solve(((tx.T).dot(tx)), (tx.T).dot(y))
+    """Minimization of the mean squared error."""
     
-    loss = compute_mse(y, tx, w);
+    # weights
+    wls = np.linalg.solve(((tx.T).dot(tx)), (tx.T).dot(y))
+
+    # loss
+    loss = compute_mse(y, tx, wls);
     
-    return w, loss
+    return wls, loss
 
 def ridge_regression(y, tx, lambda_):
-    """implement ridge regression."""    
-    w_rr = np.linalg.solve(tx.T.dot(tx) + lambda_*np.identity(tx.shape[1]) , (tx.T).dot(y))
+    """ Minimization of the penalized mean squared error with the ridge regularization. """   
     
-    loss = compute_mse(y, tx, w_rr);
+    # weights
+    wrr = np.linalg.solve(tx.T.dot(tx) + lambda_*np.identity(tx.shape[1]), (tx.T).dot(y))
     
-    return w_rr, loss
+    # loss
+    loss = compute_mse(y, tx, wrr);
+    
+    return wrr, loss
 
 def least_squares_GD(y, tx, initial_w, max_iters, gamma):
-    """Gradient descent algorithm."""
+    """ Gradient descent algorithm for minimization of the mean squared error. """
     
-    # define parameters to store w and loss
-    ws = [initial_w]
-    losses = []
-    w = initial_w
+    # initialization
+    w_tot = [initial_w]
+    loss_tot = []
 
     # optimization loop
     for n_iter in range(max_iters):
 
-        # compute new parameters
-        w = w - gamma*compute_gradient(y, tx, w)
+        # update w
+        w = w_tot[-1] - gamma*compute_gradient_mse(y, tx, w_tot[-1])
 
         # get new loss
         loss = compute_mse(y, tx, w)        
 
         # store w and loss
-        ws.append(w)
-        losses.append(loss)
+        w_tot.append(w)
+        loss_tot.append(loss)
 
-    print("Gradient Descent({bi}/{ti}): loss MSE={l}, w0={w0}, w1={w1}".format(bi=n_iter, ti=max_iters - 1, l=loss, w0=w[0], w1=w[1]))
+    print("Gradient Descent({bi}/{ti}): loss MSE={l}".format(bi=n_iter, ti=max_iters - 1, l=loss))
 
-    return ws, losses
+    return w_tot, loss_tot
     
 def least_squares_SGD(y, tx, initial_w, max_iters, gamma):
-    """Stochastic gradient descent algorithm."""
+    """ Stochastic gradient descent algorithm. """
     
-    # Define parameters to store w and loss
-    ws = [initial_w]
-    losses = []
-    w = initial_w
+    # initialization
+    w_tot = [initial_w]
+    loss_tot = []
     
     # optimization loop
     for n_iter in range(max_iters):
                 
-        # pick randomly 'batch_size' samples
+        # pick randomly samples
         batches = batch_iter(y, tx, 1, num_batches=1, shuffle=True)
 
         for samples in batches:
@@ -63,16 +68,100 @@ def least_squares_SGD(y, tx, initial_w, max_iters, gamma):
             y_tmp = samples[0]
             tx_tmp = samples[1]
         
-            # compute new parameters
-            w = ws[-1] - gamma*compute_gradient(y_tmp, tx_tmp, ws[-1])
+            # update w
+            w = w_tot[-1] - gamma*compute_gradient_mse(y_tmp, tx_tmp, w_tot[-1])
             
             # get new loss
-            loss = compute_mse(y_tmp, tx_tmp, ws[-1])        
+            loss = compute_mse(y_tmp, tx_tmp, w)        
         
         # store w and loss
-        ws.append(w)
-        losses.append(loss)
+        w_tot.append(w)
+        loss_tot.append(loss)
         
-    print("Gradient Descent({bi}/{ti}): loss MSE={l}, w0={w0}, w1={w1}".format(bi=n_iter, ti=max_iters - 1, l=loss, w0=w[0], w1=w[1]))
+    print("Stochastic Gradient Descent({bi}/{ti}): loss MSE={l}".format(bi=n_iter, ti=max_iters - 1, l=loss))
 
-    return ws, losses
+    return w_tot, loss_tot
+
+def logistic_regression(y, tx, initial_w, max_iters, gamma, method):
+    """ Minimization of the likelihood through gradient descent (method = 'gd' or Newton method (method = 'newton'). """
+    
+    # initialization
+    w_tot = [initial_w]
+    loss_tot = []
+    
+    # optimization loop
+    for n_iter in range(max_iters):
+        
+        if method == 'gd':
+
+            # compute the gradient 
+            grad = compute_gradient_logreg(y, tx, w_tot[-1], 0)
+
+            # update w
+            w = w_tot[-1] - gamma*grad
+
+        elif method == 'newton':
+
+            # compute the gradient and the hessian
+            grad = compute_gradient_logreg(y, tx, w_tot[-1], 0)
+            hess = compute_hessian_logreg(y, tx, w_tot[-1], 0)
+
+            # update w
+            w = np.linalg.solve(hess, hess.dot(w_tot[-1])-gamma*grad)
+
+        else:
+            print('The variable method has to be "gradient_descent" or "newton".')
+            break
+
+        # get new loss
+        loss = compute_likelihood_log_reg(y, tx, w)
+
+        # store w and loss
+        w_tot.append(w)
+        loss_tot.append(loss)       
+                  
+    print("Logistic Regression ({bi}/{ti}): loss MSE={l}".format(bi=n_iter, ti=max_iters - 1, l=loss))
+           
+    return w_tot, loss_tot
+
+def reg_logistic_regression(y, tx, initial_w, max_iters, gamma, method, lambda_):
+    """ Minimization of the regularized likelihood through gradient descent (method = 'gd' or Newton method (method = 'newton'). """
+    
+    # initialization
+    w_tot = [initial_w]
+    loss_tot = []
+    
+    # optimization loop
+    for n_iter in range(max_iters):
+        
+        if method == 'gd':
+
+            # compute the gradient 
+            grad = compute_gradient_logreg(y, tx, w_tot[-1], lambda_)
+
+            # update w
+            w = w_tot[-1] - gamma*grad
+
+        elif method == 'newton':
+
+            # compute the gradient and the hessian
+            grad = compute_gradient_logreg(y, tx, w_tot[-1], lambda_)
+            hess = compute_hessian_logreg(y, tx, w_tot[-1], lambda_)
+
+            # update w
+            w = np.linalg.solve(hess, hess.dot(w_tot[-1])-gamma*grad)
+            
+        else:
+            print('The variable method has to be "gradient_descent" or "newton".')
+            break
+
+        # get new regularized loss
+        loss = compute_likelihood_log_reg(y, tx, w) + lambda_*w.T.dot(w)
+        
+        # store w and loss
+        w_tot.append(w)
+        loss_tot.append(loss)       
+                  
+    print("Logistic Regression Regularized ({bi}/{ti}): loss MSE={l}".format(bi=n_iter, ti=max_iters - 1, l=loss))
+           
+    return w_tot, loss_tot
