@@ -15,7 +15,7 @@ def compute_gradient_mse(y, tx, w):
 
     return grad
 
-def compute_gradient_logreg(y, tx, w, lambda_):
+def compute_gradient_logLikelihood_reg(y, tx, w, lambda_=0):
     """compute the gradient of the likelihood for logistic regression.
     'lambda_' = 0 for the normal likelihood.
     'lambda_' > 0 for the penalized likelihood. """
@@ -24,7 +24,7 @@ def compute_gradient_logreg(y, tx, w, lambda_):
     
     return grad
 
-def compute_hessian_logreg(y, tx, w, lambda_):
+def compute_hessian_logLikelihood_reg(y, tx, w, lambda_=0):
     """compute the Hessian of the likelihood for logistic regression. 
     'lambda_' = 0 for the normal likelihood.
     'lambda_' > 0 for the penalized likelihood. """
