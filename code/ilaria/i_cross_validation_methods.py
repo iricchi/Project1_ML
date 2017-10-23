@@ -72,16 +72,16 @@ def cross_validation_ls(y,x):
     return w_tr_tot, loss_tr_tot, loss_te_tot
 
 def cross_validation_r(y, x, k_indices, k, lambda_):
-    x_te = x[k_indices[k,:]]
+    x_te = x[k_indices[k,:],:]
     y_te = y[k_indices[k,:]]
-    x_tr = x[np.union1d(k_indices[:k,:], k_indices[k+1:,:])]
+    x_tr = x[np.union1d(k_indices[:k,:], k_indices[k+1:,:]),:]
     y_tr = y[np.union1d(k_indices[:k,:], k_indices[k+1:,:])]
     
-    w_tr = ridge_regression(y_tr, x_tr, lambda_)
+    w_tr, loss_tr = ridge_regression(y_tr, x_tr, lambda_)
     
    # calculate the loss for train and test data
-    rmse_tr = np.sqrt(2*compute_mse_reg(y_tr, x_tr, w_tr))
-    rmse_te = np.sqrt(2*compute_mse_reg(y_te, x_te, w_tr))
+    rmse_tr = np.sqrt(2*compute_mse_reg(y_tr, x_tr, w_tr, lambda_))
+    rmse_te = np.sqrt(2*compute_mse_reg(y_te, x_te, w_tr, lambda_))
     
     return w_tr, rmse_tr, rmse_te
 
@@ -120,3 +120,54 @@ def cross_validation_rr(y,x):
         w_tr_tot.append(np.mean(w_tr_all, axis=0))
         
     return w_tr_tot, rmse_tr, rmse_te
+
+def cross_validation_l(y, x, k_indices, k, initial_w,max_iters,gamma,method):
+    x_te = x[k_indices[k,:],:]
+    y_te = y[k_indices[k,:]]
+    x_tr = x[np.union1d(k_indices[:k,:], k_indices[k+1:,:]),:]
+    y_tr = y[np.union1d(k_indices[:k,:], k_indices[k+1:,:])]
+    
+    w_tr_tot,loss = logistic_regression(y_tr, x_tr, initial_w, max_iters, gamma, method)
+    w_tr = w_tr_tot[-1]
+    
+    rmse_tr = np.sqrt(2*compute_mse_reg(y_tr, x_tr, w_tr))
+    rmse_te = np.sqrt(2*compute_mse_reg(y_te, x_te, w_tr))
+    
+    return w_tr, rmse_tr, rmse_te
+
+def cross_validation_lr(y,x):
+    seed = 1
+    k_fold = 5
+    gammas = np.logspace(-4, 0, 30)
+    
+    k_indices = build_k_indices(y, k_fold, seed)
+    
+    # define lists to store the loss of training data and test data
+    rmse_tr = []
+    rmse_te = []
+    w_tr_tot = []
+    
+    for  gamma in gammas:
+        w_tr_all = []
+        rmse_tr_all = []
+        rmse_te_all = []
+        
+            
+        for k in range(k_fold):        
+        
+            # compute losses for the k'th fold
+            w_tr_tmp, rmse_tr_tmp, rmse_te_tmp = cross_validation_l(y, x, k_indices, k, initial_w, max_iters, gamma, method)
+
+            # store losses
+            w_tr_all.append(w_tr_tmp)
+            rmse_tr_all.append(rmse_tr_tmp)
+            rmse_te_all.append(rmse_te_tmp)
+        
+        # store mean losses
+        rmse_tr.append(np.mean(rmse_tr_all))
+        rmse_te.append(np.mean(rmse_te_all))
+        w_tr_tot.append(np.mean(w_tr_all, axis=0))
+        
+    return w_tr_tot, rmse_tr, rmse_te
+    
+    
