@@ -85,12 +85,9 @@ def cross_validation_k(y, x, k_indices, k, args):
         loss_te = compute_mae_reg(y_te, phi_te, w_tr, lambda_)
      
     if args['loss'] == 'logLikelihood':
-
-        ylabels_tr = predict_labels(w_tr, phi_tr)
-        ylabels_te = predict_labels(w_tr, phi_te)
         
-        loss_tr = compute_logLikelihood_reg(ylabels_tr, phi_tr, w_tr, lambda_)
-        loss_te = compute_logLikelihood_reg(ylabels_te, phi_te, w_tr, lambda_)
+        loss_tr = compute_logLikelihood_reg(y_tr, phi_tr, w_tr, lambda_)
+        loss_te = compute_logLikelihood_reg(y_te, phi_te, w_tr, lambda_)
         
     return w_tr, loss_tr, loss_te
     
