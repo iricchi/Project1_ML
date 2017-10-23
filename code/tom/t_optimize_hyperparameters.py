@@ -8,7 +8,7 @@ def optimize_lambda(y, x, lambda_min, lambda_max, lambda_steps, args):
     
     # tested lambdas
     lambda_set = np.logspace(lambda_min, lambda_max, lambda_steps)
-    print('tested lambda_: ', lambda_set)
+    print('tested lambda_: ', lambda_set, '\n')
 
     # store losses
     min_loss_tr_all = []
@@ -18,7 +18,8 @@ def optimize_lambda(y, x, lambda_min, lambda_max, lambda_steps, args):
         
         # update lambda_ in the model
         args['lambda_'] = lambda_tmp
-        
+        print('------------------------------------------ cross validation with lambda_ = ', lambda_tmp)
+
         # cross validation with lambda_tmp
         _, loss_tr_tot_tmp, loss_te_tot_tmp = cross_validation(y, x, args)
         
@@ -33,7 +34,7 @@ def optimize_lambda(y, x, lambda_min, lambda_max, lambda_steps, args):
     cross_validation_visualization_lambda(lambda_set, min_loss_tr_all, min_loss_te_all)
     print('------------------------')
     print('Optimal lambda: ', lambda_opt)
-    print('Associated testing loss: ', min(min_loss_te_all))
+    print('Associated testing loss: ', min(min_loss_te_all), '\n')
 
     return lambda_opt
 
@@ -42,8 +43,8 @@ def optimize_degree(y, x, degree_min, degree_max, degree_steps, args):
     as the one which gives the lowest testing loss."""
     
     # tested degrees
-    degree_set = np.arange(degree_min, degree_max, degree_steps)
-    print('tested degree: ', degree_set)
+    degree_set = np.arange(degree_min, degree_max+1, degree_steps)
+    print('tested degree: ', degree_set, '\n')
     
     # store losses
     min_loss_tr_all = []
@@ -53,7 +54,8 @@ def optimize_degree(y, x, degree_min, degree_max, degree_steps, args):
         
         # update degree in the model
         args['degree'] = degree_tmp
-        
+        print('------------------------------------------ cross validation with degree = ', degree_tmp)
+
         # cross validation with degree_tmp
         _, loss_tr_tot_tmp, loss_te_tot_tmp = cross_validation(y, x, args)
         
@@ -68,7 +70,7 @@ def optimize_degree(y, x, degree_min, degree_max, degree_steps, args):
     cross_validation_visualization_degree(degree_set, min_loss_tr_all, min_loss_te_all)
     print('------------------------')
     print('Optimal degree: ', degree_opt)
-    print('Associated testing loss: ', min(min_loss_te_all))
+    print('Associated testing loss: ', min(min_loss_te_all), '\n')
 
     return degree_opt
 
@@ -77,8 +79,8 @@ def optimize_gamma(y, x, gamma_min, gamma_max, gamma_steps, args):
     or newton). The best gamma is chosen as the one which gives the lowest testing loss."""
     
     # tested gamma values
-    gamma_set = np.linspace(gamma_min, gamma_max, num=gamma_steps)
-    print('tested gamma: ', gamma_set)
+    gamma_set = np.logspace(gamma_min, gamma_max, gamma_steps)
+    print('tested gamma: ', gamma_set, '\n')
     
     # store losses
     min_loss_tr_all = []
@@ -88,6 +90,7 @@ def optimize_gamma(y, x, gamma_min, gamma_max, gamma_steps, args):
         
         # update gamma in the model
         args['gamma'] = gamma_tmp
+        print('------------------------------------------ cross validation with gamma = ', gamma_tmp)
         
         # cross validation with gamma_tmp
         _, loss_tr_tot_tmp, loss_te_tot_tmp = cross_validation(y, x, args)
@@ -103,6 +106,6 @@ def optimize_gamma(y, x, gamma_min, gamma_max, gamma_steps, args):
     cross_validation_visualization_gamma(gamma_set, min_loss_tr_all, min_loss_te_all)
     print('------------------------')
     print('Optimal gamma: ', gamma_opt)
-    print('Associated testing loss: ', min(min_loss_te_all))
+    print('Associated testing loss: ', min(min_loss_te_all), '\n')
 
     return gamma_opt
