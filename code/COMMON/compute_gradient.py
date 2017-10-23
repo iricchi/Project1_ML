@@ -2,7 +2,7 @@ from sigmoid import sigmoid
 import numpy as np
 
 def compute_gradient_mse(y, tx, w):
-    """Compute the gradient of the MSE."""
+    """Compute the gradient of the mean squared error (mse)."""
 
     # number of samples
     N = len(y)

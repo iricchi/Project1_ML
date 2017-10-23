@@ -21,12 +21,12 @@ def ridge_regression(y, tx, lambda_):
     wrr = np.linalg.solve(tx.T.dot(tx) + lambda_*np.identity(tx.shape[1]), (tx.T).dot(y))
     
     # loss
-    loss = compute_mse_reg(y, tx, wrr);
+    loss = compute_mse_reg(y, tx, wrr, lambda_);
     
     return wrr, loss
 
 def least_squares_GD(y, tx, initial_w, max_iters, gamma):
-    """ Gradient descent algorithm for minimization of the mean squared error. """
+    """ Gradient descent algorithm for minimization of the mean squared error (mse). """
     
     # initialization
     w_tot = [initial_w]
@@ -120,7 +120,7 @@ def logistic_regression(y, tx, initial_w, max_iters, gamma, method):
         w_tot.append(w)
         loss_tot.append(loss)       
                   
-    print("Logistic Regression ({bi}/{ti}): loss MSE={l}".format(bi=n_iter, ti=max_iters - 1, l=loss))
+    print("Logistic Regression ({bi}/{ti}): loss logLikelihood={l}".format(bi=n_iter, ti=max_iters - 1, l=loss))
            
     return w_tot, loss_tot
 
@@ -162,6 +162,6 @@ def reg_logistic_regression(y, tx, initial_w, max_iters, gamma, method, lambda_)
         w_tot.append(w)
         loss_tot.append(loss)       
                   
-    print("Logistic Regression Regularized ({bi}/{ti}): loss MSE={l}".format(bi=n_iter, ti=max_iters - 1, l=loss))
+    print("Logistic Regression Regularized ({bi}/{ti}): loss logLikelihood={l}".format(bi=n_iter, ti=max_iters - 1, l=loss))
            
     return w_tot, loss_tot
