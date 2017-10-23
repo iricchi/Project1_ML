@@ -1,7 +1,7 @@
 import numpy as np
 
 """
-Set delete to 1 if you want to delete -999 from the dataset,
+Set delete to 1 if you want to delete samples with -999 from the dataset,
 Set delete to 0 if you want to substitude -999 with 0,
 Set delete to 'mean' if you want to substitude -999 with the mean
 Set delete to 'median' if you want to substitude -999 with the median
