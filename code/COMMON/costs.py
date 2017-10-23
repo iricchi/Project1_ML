@@ -41,7 +41,7 @@ def compute_logLikelihood_reg(ylabels, tx, w, lambda_=0):
     """Calculate the cost by negative log likelihood, regularized when lambda_>0. """
 
     # log-likelihood
-    logLikelihood = 1
+    logLikelihood = 0
     for i in range(1,ylabels.shape[0]):
         logLikelihood = logLikelihood + ylabels[i]*np.log10(sigmoid(tx[i,:].T.dot(w))) + (1-ylabels[i])*np.log10(1-sigmoid(tx[i,:].T.dot(w)))                     
 
