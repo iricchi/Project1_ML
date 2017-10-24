@@ -45,7 +45,7 @@ def optimize_lambda(y, x, lambda_min, lambda_max, lambda_steps, args):
     # results
     cross_validation_visualization_lambda(lambda_set, mean_loss_tr_all, mean_loss_te_all)
     print('Optimal lambda: ', lambda_opt)
-    print('Associated testing loss: ', min(mean_loss_te_all), '\n')
+    print('Associated testing loss: ', loss_te, '\n')
 
     return w_opt, loss_tr, loss_te, lambda_opt
 
@@ -94,7 +94,7 @@ def optimize_degree(y, x, degree_min, degree_max, degree_steps, args):
     # results
     cross_validation_visualization_degree(degree_set, mean_loss_tr_all, mean_loss_te_all)
     print('Optimal degree: ', degree_opt)
-    print('Associated testing loss: ', min(mean_loss_te_all), '\n')
+    print('Associated testing loss: ', loss_te, '\n')
 
     return w_opt, loss_tr, loss_te, degree_opt
 
@@ -123,8 +123,8 @@ def optimize_gamma(y, x, gamma_min, gamma_max, gamma_steps, args):
         w_tr_tmp, loss_tr_tot_tmp, loss_te_tot_tmp = cross_validation(y, x, args)
         
         # store mean losses
-        mean_loss_tr_all.append(min(loss_tr_tot_tmp))
-        mean_loss_te_all.append(min(loss_te_tot_tmp))
+        mean_loss_tr_all.append(np.mean(loss_tr_tot_tmp))
+        mean_loss_te_all.append(np.mean(loss_te_tot_tmp))
 
         # store the weights related to the minimum loss (testing loss)
         w_list.append(w_tr_tmp[np.argmin(loss_te_tot_tmp)])
@@ -137,12 +137,9 @@ def optimize_gamma(y, x, gamma_min, gamma_max, gamma_steps, args):
     loss_tr = mean_loss_tr_all[best_indx]
     loss_te = mean_loss_te_all[best_indx]
     
-    # extract the optimal value for gamma
-    gamma_opt = gamma_set[mean_loss_te_all.index(min(mean_loss_te_all))]
-    
     # results
     cross_validation_visualization_gamma(gamma_set, mean_loss_tr_all, mean_loss_te_all)
     print('Optimal gamma: ', gamma_opt)
-    print('Associated testing loss: ', min(mean_loss_te_all), '\n')
+    print('Associated testing loss: ', loss_te, '\n')
 
     return w_opt, loss_tr, loss_te, gamma_opt
