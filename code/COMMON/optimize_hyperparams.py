@@ -1,6 +1,7 @@
 from plots import *
 from cross_validation import *
 import matplotlib.pyplot as plt
+from build_poly import build_poly
 
 def optimize_lambda(y, x, lambda_min, lambda_max, lambda_steps, args):
     """Optimization of the hyper-parameter lambda_ driving regularization. The best lambda_ is chosen
@@ -56,8 +57,11 @@ def optimize_degree(y, x, degree_min, degree_max, degree_steps, args):
         args['degree'] = degree_tmp
         print('------------------------------------------ cross validation with degree = ', degree_tmp)
 
+        # build polynomial basis function
+        phi = build_poly(x, degree_tmp)
+        
         # cross validation with degree_tmp
-        _, loss_tr_tot_tmp, loss_te_tot_tmp = cross_validation(y, x, args)
+        _, loss_tr_tot_tmp, loss_te_tot_tmp = cross_validation(y, phi, args)
         
         # store
         min_loss_tr_all.append(min(loss_tr_tot_tmp))

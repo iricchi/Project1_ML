@@ -162,6 +162,6 @@ def reg_logistic_regression(y, tx, initial_w, max_iters, gamma, method, lambda_)
         w_tot.append(w)
         loss_tot.append(loss)       
                   
-    print("Logistic Regression Regularized ({bi}/{ti}): loss logLikelihood={l}".format(bi=n_iter, ti=max_iters - 1, l=loss))
+    print("Logistic Regression Regularized ({bi}/{ti}): loss loglikelihood={l}".format(bi=n_iter, ti=max_iters - 1, l=loss))
            
     return w_tot, loss_tot

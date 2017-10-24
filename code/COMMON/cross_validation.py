@@ -1,5 +1,4 @@
 import numpy as np
-from build_poly import build_poly
 from implementations import *
 from proj1_helpers import predict_labels
 
@@ -81,10 +80,10 @@ def cross_validation_k(y, X, k_indices, k, args):
         loss_tr = compute_mae_reg(y_tr, X_tr, w_tr, lambda_)
         loss_te = compute_mae_reg(y_te, X_te, w_tr, lambda_)
      
-    if args['loss'] == 'logLikelihood':
+    if args['loss'] == 'loglikelihood':
         
-        loss_tr = compute_logLikelihood_reg(y_tr, X_tr, w_tr, lambda_)
-        loss_te = compute_logLikelihood_reg(y_te, X_te, w_tr, lambda_)
+        loss_tr = compute_loglikelihood_reg(y_tr, X_tr, w_tr, lambda_)
+        loss_te = compute_loglikelihood_reg(y_te, X_te, w_tr, lambda_)
         
     return w_tr, loss_tr, loss_te
     

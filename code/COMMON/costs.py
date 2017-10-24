@@ -41,7 +41,6 @@ def compute_mae_reg(y, tx, w, lambda_=0):
 def compute_loglikelihood_reg(y, tx, w, lambda_=0):
     #y[np.where(y ==-1)] = 0
     loglikelihood = np.sum(np.log(1+np.exp(tx.dot(w))) - y*(tx.dot(w))) + lambda_*w.T.dot(w)
-   
     
     return loglikelihood
     
