@@ -8,3 +8,4 @@ code/ilaria/i_features.ipynb
 *.csv
 code/COMMON/test_implementations.ipynb
 code/COMMON/__pycache__/proj1_helpers.cpython-36.pyc
+*.pyc
