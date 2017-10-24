@@ -2,7 +2,7 @@ import numpy as np
 from implementations import *
 from proj1_helpers import predict_labels
 
-def build_k_indices(num_samples, k_fold, seed=0):
+def build_k_indices(num_samples, k_fold, seed=0, debug_mode=0):
     """build k indices for k-fold."""
     
     # number of samples per fold
@@ -16,8 +16,9 @@ def build_k_indices(num_samples, k_fold, seed=0):
     k_indices = [indices[k * interval: (k + 1) * interval]
                  for k in range(k_fold)]
     
-    print("Number of samples in total: ", num_samples)
-    print("Number of folds: ",k_fold, " of", interval, "samples.")
+    if debug_mode:
+        print("Number of samples in total: ", num_samples)
+        print("Number of folds: ",k_fold, " of", interval, "samples.")
     
     return np.array(k_indices)
 
@@ -87,7 +88,7 @@ def cross_validation_k(y, X, k_indices, k, args):
         
     return w_tr, loss_tr, loss_te
     
-def cross_validation(y, X, args):
+def cross_validation(y, X, args, debug_mode=0):
             
     # store weights and losses
     w_tr_tot = []
@@ -96,7 +97,7 @@ def cross_validation(y, X, args):
 
     # build k folds of indices 
     num_samples = y.shape[0]
-    k_indices = build_k_indices(num_samples, args['k_fold'])
+    k_indices = build_k_indices(num_samples, args['k_fold'], debug_mode=debug_mode)
     
     # cross validation
     for k in range(args['k_fold']):        
@@ -109,7 +110,8 @@ def cross_validation(y, X, args):
         loss_tr_tot.append(loss_tr_k)
         loss_te_tot.append(loss_te_k)
 
-    print('Mean training loss: ', np.mean(loss_tr_tot))
-    print('Mean testing loss: ', np.mean(loss_te_tot))
+    if debug_mode:
+        print('Mean training loss: ', np.mean(loss_tr_tot))
+        print('Mean testing loss: ', np.mean(loss_te_tot))
 
     return w_tr_tot, loss_tr_tot, loss_te_tot
