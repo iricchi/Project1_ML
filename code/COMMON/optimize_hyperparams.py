@@ -131,6 +131,7 @@ def optimize_gamma(y, x, gamma_min, gamma_max, gamma_steps, args):
         
     # extract the optimal value for lambda and the relatives weights, loss_tr, loss_te
     best_indx = mean_loss_te_all.index(min(mean_loss_te_all))
+    
     gamma_opt = gamma_set[best_indx]
     w_opt = w_list[best_indx]
     loss_tr = mean_loss_tr_all[best_indx]
