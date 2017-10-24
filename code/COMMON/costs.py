@@ -37,15 +37,11 @@ def compute_mae_reg(y, tx, w, lambda_=0):
     
     return mae_reg
 
-def compute_logLikelihood_reg(ylabels, tx, w, lambda_=0):
-    """Calculate the cost by negative log likelihood, regularized when lambda_>0. """
 
-    # log-likelihood
-    logLikelihood = 0
-    for i in range(1,ylabels.shape[0]):
-        logLikelihood = logLikelihood + ylabels[i]*np.log10(sigmoid(tx[i,:].T.dot(w))) + (1-ylabels[i])*np.log10(1-sigmoid(tx[i,:].T.dot(w)))                     
-
-    # regularized when lambda_>0
-    logLikelihood_reg = logLikelihood + lambda_*w.T.dot(w)
+def compute_loglikelihood_reg(y, tx, w, lambda_=0):
+    #y[np.where(y ==-1)] = 0
+    loglikelihood = np.sum(np.log(1+np.exp(tx.dot(w))) - y*(tx.dot(w))) + lambda_*w.T.dot(w)
+   
     
-    return -logLikelihood_reg
+    return loglikelihood
+    

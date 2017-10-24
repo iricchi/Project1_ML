@@ -14,14 +14,6 @@ from split_data import split_data
 sys.path.insert(0,my_path + r'/code/ilaria')
 from i_cross_validation_methods import *
 
-# Subdived the X features space in single features
-all_features = np.genfromtxt(my_path + r'/data/train.csv', delimiter=",", dtype=str, max_rows = 1)[2:]
-# converting array in list in order to simplify the adding of features
-all_features = list(all_features)
-
-features = []
-for i in range(len(all_features)):
-    features.append((i,all_features[i]))
 
 def results_r2_stepwise(list_r2_adj,indices_features):
     print("R2 asjusted values:")
@@ -32,5 +24,18 @@ def results_r2_stepwise(list_r2_adj,indices_features):
     print("Number of features chosen:", len(indices_features))
     print("\n")
     print("Indices of features chosen: ", indices_features)
+
+
+# Subdived the X features space in single features
+all_features = np.genfromtxt(my_path + r'/data/train.csv', delimiter=",", dtype=str, max_rows = 1)[2:]
+# converting array in list in order to simplify the adding of features
+all_features = list(all_features)
+
+features = []
+for i in range(len(all_features)):
+    features.append((i,all_features[i]))
+
+    
+
     
 

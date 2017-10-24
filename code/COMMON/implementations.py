@@ -114,7 +114,7 @@ def logistic_regression(y, tx, initial_w, max_iters, gamma, method):
             break
 
         # get new loss
-        loss = compute_logLikelihood_reg(y, tx, w)
+        loss = compute_loglikelihood_reg(y, tx, w)  # Ilaria: I have changed with my version
 
         # store w and loss
         w_tot.append(w)
@@ -156,7 +156,7 @@ def reg_logistic_regression(y, tx, initial_w, max_iters, gamma, method, lambda_)
             break
 
         # get new regularized loss
-        loss = compute_logLikelihood_reg(y, tx, w, lambda_)
+        loss = compute_loglikelihood_reg(y, tx, w, lambda_)
         
         # store w and loss
         w_tot.append(w)
