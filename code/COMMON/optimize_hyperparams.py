@@ -3,15 +3,29 @@ from cross_validation import *
 import matplotlib.pyplot as plt
 from build_poly import build_poly
 
+
+###
+# Compute the optimal lambda using the cross validation 
+#
+# @Returns:
+#    - w_tot     : weights of the chosen model (the one with the best lambda)
+#    - loss_tr   : minimum(!) training loss taken from the k folds of the chosen model (not sure if correct!)
+#    - loss_te   : minimum(!) testing loss taken from the k folds of the chosen model
+#    - lambda_opt: chosen lambda
+#
+###
 def optimize_lambda(y, x, lambda_min, lambda_max, lambda_steps, args):
     """Optimization of the hyper-parameter lambda_ driving regularization. The best lambda_ is chosen
     as the one which gives the lowest testing loss."""
     
-    # tested lambdas
+    # create set of lambdas to test
     lambda_set = np.logspace(lambda_min, lambda_max, lambda_steps)
     print('tested lambda_: ', lambda_set, '\n')
 
-    # store losses
+    # store weights
+    w_list = []
+    
+    # store minimum losses from cross-validation from every lambda
     min_loss_tr_all = []
     min_loss_te_all = []
 
@@ -22,14 +36,25 @@ def optimize_lambda(y, x, lambda_min, lambda_max, lambda_steps, args):
         print('------------------------------------------ cross validation with lambda_ = ', lambda_tmp)
 
         # cross validation with lambda_tmp
-        _, loss_tr_tot_tmp, loss_te_tot_tmp = cross_validation(y, x, args)
+        w_tr_tmp, loss_tr_tot_tmp, loss_te_tot_tmp = cross_validation(y, x, args)
         
-        # store
+        # store minimum losses from the k folds
         min_loss_tr_all.append(min(loss_tr_tot_tmp))
         min_loss_te_all.append(min(loss_te_tot_tmp))
+        
+        # store the weights related to the minimum loss (testing loss)
+        w_list.append(w_tr_tmp[np.argmin(loss_te_tot_tmp)])
+        
+    print("sono arrivato")
 
-    # extract the optimal value for lambda
-    lambda_opt = lambda_set[min_loss_te_all.index(min(min_loss_te_all))]
+    # extract the optimal value for lambda and the relatives weights, loss_tr, loss_te
+    best_indx = min_loss_te_all.index(min(min_loss_te_all))
+    
+    lambda_opt = lambda_set[best_indx]
+    w_tot = w_list[best_indx]
+    loss_tr = min_loss_tr_all[best_indx]
+    loss_te = min_loss_te_all[best_indx]
+    
     
     # results
     cross_validation_visualization_lambda(lambda_set, min_loss_tr_all, min_loss_te_all)
@@ -37,7 +62,7 @@ def optimize_lambda(y, x, lambda_min, lambda_max, lambda_steps, args):
     print('Optimal lambda: ', lambda_opt)
     print('Associated testing loss: ', min(min_loss_te_all), '\n')
 
-    return lambda_opt
+    return w_tot, loss_tr, loss_te, lambda_opt
 
 def optimize_degree(y, x, degree_min, degree_max, degree_steps, args):
     """Optimization of the degree of the polynomial basis function. The best degree is chosen
