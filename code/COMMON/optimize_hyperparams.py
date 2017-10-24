@@ -39,8 +39,8 @@ def optimize_lambda(y, x, lambda_min, lambda_max, lambda_steps, args):
         w_tr_tmp, loss_tr_tot_tmp, loss_te_tot_tmp = cross_validation(y, x, args)
         
         # store minimum losses from the k folds
-        min_loss_tr_all.append(min(loss_tr_tot_tmp))
-        min_loss_te_all.append(min(loss_te_tot_tmp))
+        min_loss_tr_all.append(np.mean(loss_tr_tot_tmp))
+        min_loss_te_all.append(np.mean(loss_te_tot_tmp))
         
         # store the weights related to the minimum loss (testing loss)
         w_list.append(w_tr_tmp[np.argmin(loss_te_tot_tmp)])
