@@ -28,7 +28,7 @@ def stepwise(model, R2_method, all_candidates, features, y_true, cv):
     numFeat = all_candidates.shape[1]
     
     # offset
-    H = np.ones((n,1)) 
+    H = np.ones((numSamples,1)) 
 
     # initialization (only with the offset: lack of info)
     X = H
