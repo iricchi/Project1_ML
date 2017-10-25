@@ -90,7 +90,7 @@ def stepwise(model, R2_method, all_candidates, features, Y, cv):
                     print('No correct type of model specified')
             elif cv == 1:
                 if model['method'] == 'ls':
-                    w_tr_tot, loss_tr_tot, loss_te_tot = cross_validation(Y, X, arg_ls)
+                    w_tr_tot, loss_tr_tot, loss_te_tot = cross_validation(Y, X, model)
                     ws = w_tr_tot[np.argmin(loss_te_tot)]
                     loss = np.min(loss_te_tot)
                     y = predict_labels(ws, X)
