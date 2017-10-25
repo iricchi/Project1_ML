@@ -16,6 +16,7 @@ def results_r2_stepwise(list_r2_adj,indices_features):
     
     for i in range(len(list_r2_adj)):
         print(list_r2_adj[i])
+        
     print("-------------------------------------------------------")
     print("Number of features chosen:", len(indices_features))
     print("\n")
@@ -41,7 +42,13 @@ def stepwise(model, R2_method, all_candidates, features, Y, cv):
     elif model['method'] == 'lr':
         initial_w = np.ones(X.shape[1])
         w0, loss = logistic_regression(Y,X, initial_w, model['max_iters'], model['gamma'], model['method_minimization'])
-        y = predict_labels(w0[-1], X)        
+        y = predict_labels(w0[-1], X)
+    elif model['method'] == 'lsgd':
+        initial_w = np.ones(X.shape[1])
+        w0, loss = least_squares_GD(Y,X, initial_w, model['max_iters'], model['gamma'], model['threshold'])
+        y = predict_labels(w0[-1], X)   
+        print('ok')
+
     else:
         print('No correct type of model specified')
         
@@ -54,10 +61,10 @@ def stepwise(model, R2_method, all_candidates, features, Y, cv):
         ind_back, ind_sig = idx_2labels(y, [0,1])
         y_ = X.dot(w0)
         R2 = 0
-    elif R2_method == 'McFadden' and (model['method'] == 'ls' or model['method'] == 'rr'):
+    elif R2_method == 'McFadden'  and model['method'] in ['ls', 'rr']:
         loglike0 = compute_loglikelihood_reg(y,X,w0) #np.sum(np.log(1+np.exp(X.dot(w0))) - y*(X.dot(w0)))
         R2 = 0 # definition = 1 - loglike0/loglike0 = 1 -1       
-    elif R2_method == 'McFadden' and model['method'] == 'lr':
+    elif R2_method == 'McFadden' and model['method'] in ['lr', 'lsgd']:
         loglike0 = compute_loglikelihood_reg(y, X, w0[-1])
         R2 = 0
     else:
@@ -79,6 +86,7 @@ def stepwise(model, R2_method, all_candidates, features, Y, cv):
 
             X = np.concatenate((H,all_candidates[:,i].reshape(n,1)), axis=1)
             if cv == 0:
+                
                 if model['method'] == 'ls':
                     ws , loss = least_squares(Y,X)
                     y = predict_labels(ws, X)
@@ -87,12 +95,17 @@ def stepwise(model, R2_method, all_candidates, features, Y, cv):
                     y = predict_labels(ws, X)
                 elif model['method'] == 'lr':
                     initial_w = np.ones(X.shape[1])
-                    ws, loss = logistic_regression(Y,X, initial_w, model['max_iters'], model['gamma'],
-                                                   model['method_minimization'])
+                    ws, loss = logistic_regression(Y,X, initial_w, model['max_iters'], model['gamma'], model['method_minimization'])
                     y = predict_labels(ws[-1], X)
+                elif model['method']== 'lsgd':
+                    initial_w = np.ones(X.shape[1])
+                    ws, loss = least_squares_GD(Y,X, initial_w, model['max_iters'], model['gamma'], model['threshold'])
+                    y = predict_labels(ws[-1], X)   
                 else:
                     print('No correct type of model specified')
+                    
             elif cv == 1:
+                
                 if model['method'] == 'ls':
                     w_tr_tot, loss_tr_tot, loss_te_tot = cross_validation(Y, X, model)
                     ws = w_tr_tot[np.argmin(loss_te_tot)]
@@ -106,21 +119,26 @@ def stepwise(model, R2_method, all_candidates, features, Y, cv):
                     ws, loss_tr, loss, lambda_opt = optimize_lambda(Y, X, model['lambda_min'], model['lambda_max'],
                                                                     model['lambda_steps'], model)
                     y = predict_labels(ws, X)
+                elif model['method']== 'lsgd':
+                    initial_w = np.ones(X.shape[1])
+                    ws, loss_tr, loss, lambda_opt = optimize_lambda(Y, X, model['lambda_min'], model['lambda_max'],
+                                                                    model['lambda_steps'], model)
+                    y = predict_labels(ws, X)  
                 else:
                     print('No correct type of model specified')    
-                     
                     
             else:
                 print('No cross validation specified: cv = 0 or 1')
                 
-                
             if R2_method == 'loss':
+                
                 SSE = loss*2*n
                 SST = np.sum((Y- Y.mean())**2)
-                R2 = np.abs((SST-SSE)/SST)   
+                R2 = np.abs((SST-SSE)/SST) 
+                
             elif R2_method == 'Tjur':
+                
                 ind_back, ind_sig = idx_2labels(y, [0,1])
-        
                 if len(ind_sig) == 0 or len(ind_back) ==0:
                     print('No signal detected')
                     R2_adj.append(0)
@@ -128,14 +146,19 @@ def stepwise(model, R2_method, all_candidates, features, Y, cv):
                     y_ = X.dot(ws)
                     R2 = np.abs((np.mean(y_[ind_sig]) - np.mean(y_[ind_back])))
             
-            elif R2_method == 'McFadden'  and (model['method'] == 'ls' or model['method'] == 'rr'):
-                loglike = compute_loglikelihood_reg(y,X,ws) #np.sum(np.log(1+np.exp(X.dot(ws))) - y*(X.dot(ws)))
+            elif R2_method == 'McFadden'  and model['method'] in ['ls', 'rr']:
+                
+                loglike = compute_loglikelihood_reg(y,X,ws)
                 R2 = 1-(loglike/loglike0)
-            elif R2_method == 'McFadden' and model['method'] == 'lr':
+                
+            elif R2_method == 'McFadden' and model['method'] in ['lr', 'lsgd']:
+                
                 loglike = compute_loglikelihood_reg(y,X,ws[-1])
                 R2 = 1-(loglike/loglike0)
+                
             else:
                 print('No correct method of R2 specified') 
+                
             k = len(ws) -1 # k is the number of regressor I use -> -1 because I don't consider the offset
             R2_adj.append(R2 - (k/(n-k-1)*(1-R2)))         
             
@@ -144,12 +167,12 @@ def stepwise(model, R2_method, all_candidates, features, Y, cv):
         idx_chosen = np.argmax(R2_adj)
 
         if R2adj_chosen > R2adj_max:
+            
             R2adj_max = R2adj_chosen
             ind_max = idx_chosen
-
             H = np.concatenate((H, all_candidates[:,ind_max].reshape(n,1)), axis = 1)
-
             all_candidates = np.delete(all_candidates,ind_max,1)
+            
             print('-------------------------------------------------')
             print('Feature chosen: ', features[ind_max][1], '(index :', features[ind_max][0], ')')
             idx_features.append(features[ind_max][0])
@@ -159,16 +182,4 @@ def stepwise(model, R2_method, all_candidates, features, Y, cv):
         else:
             break
             
-            
     return best_R2adj, idx_features
-            
-            
-            
-            
-            
-
-    
-    
-
-    
-
