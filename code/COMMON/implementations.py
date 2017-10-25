@@ -25,18 +25,23 @@ def ridge_regression(y, tx, lambda_):
     
     return wrr, loss
 
-def least_squares_GD(y, tx, initial_w, max_iters, gamma):
+def least_squares_GD(y, tx, initial_w, max_iters, gamma, threshold=1e-3):
     """ Gradient descent algorithm for minimization of the mean squared error (mse). """
     
     # initialization
     w_tot = [initial_w]
     loss_tot = []
-
+    n_iter = 0
+    continue_ = True
+    
     # optimization loop
-    for n_iter in range(max_iters):
+    while continue_:
 
+        # compute gradient
+        grad = compute_gradient_mse(y, tx, w_tot[-1])
+        
         # update w
-        w = w_tot[-1] - gamma*compute_gradient_mse(y, tx, w_tot[-1])
+        w = w_tot[-1] - gamma*grad
 
         # get new loss
         loss = compute_mse_reg(y, tx, w)        
@@ -45,19 +50,25 @@ def least_squares_GD(y, tx, initial_w, max_iters, gamma):
         w_tot.append(w)
         loss_tot.append(loss)
 
-    print("Gradient Descent({bi}/{ti}): loss MSE={l}".format(bi=n_iter, ti=max_iters - 1, l=loss))
+        # check for stopping criteria
+        n_iter = n_iter + 1
+        continue_ = n_iter < max_iters and np.linalg.norm(grad) > threshold
+        
+    print("Gradient Descent({bi}/{ti}): loss MSE={l}".format(bi=n_iter, ti=max_iters, l=loss))
 
     return w_tot, loss_tot
     
-def least_squares_SGD(y, tx, initial_w, max_iters, gamma, batch_size):
+def least_squares_SGD(y, tx, initial_w, max_iters, gamma, batch_size, threshold=1e-3):
     """ Stochastic gradient descent algorithm. """
     
     # initialization
     w_tot = [initial_w]
     loss_tot = []
+    n_iter = 0
+    continue_ = True
     
     # optimization loop
-    for n_iter in range(max_iters):
+    while continue_:
                 
         # pick randomly samples
         batches = batch_iter(y, tx, batch_size, num_batches=1, shuffle=True)
@@ -68,8 +79,11 @@ def least_squares_SGD(y, tx, initial_w, max_iters, gamma, batch_size):
             y_tmp = samples[0]
             tx_tmp = samples[1]
         
+            # compute gradient
+            grad = compute_gradient_mse(y_tmp, tx_tmp, w_tot[-1])
+            
             # update w
-            w = w_tot[-1] - gamma*compute_gradient_mse(y_tmp, tx_tmp, w_tot[-1])
+            w = w_tot[-1] - gamma*grad
             
             # get new loss
             loss = compute_mse_reg(y_tmp, tx_tmp, w)        
@@ -78,19 +92,25 @@ def least_squares_SGD(y, tx, initial_w, max_iters, gamma, batch_size):
         w_tot.append(w)
         loss_tot.append(loss)
         
-    print("Stochastic Gradient Descent({bi}/{ti}): loss MSE={l}".format(bi=n_iter, ti=max_iters - 1, l=loss))
+        # check for stopping criteria
+        n_iter = n_iter + 1
+        continue_ = n_iter < max_iters and np.linalg.norm(grad) > threshold
+        
+    print("Stochastic Gradient Descent({bi}/{ti}): loss MSE={l}".format(bi=n_iter, ti=max_iters, l=loss))
 
     return w_tot, loss_tot
 
-def logistic_regression(y, tx, initial_w, max_iters, gamma, method):
+def logistic_regression(y, tx, initial_w, max_iters, gamma, method, threshold=1e-3):
     """ Minimization of the likelihood through gradient descent (method = 'gd' or Newton method (method = 'newton'). """
     
     # initialization
     w_tot = [initial_w]
     loss_tot = []
+    n_iter = 0
+    continue_ = True
     
     # optimization loop
-    for n_iter in range(max_iters):
+    while continue_:
         
         if method == 'gd':
 
@@ -119,20 +139,26 @@ def logistic_regression(y, tx, initial_w, max_iters, gamma, method):
         # store w and loss
         w_tot.append(w)
         loss_tot.append(loss)       
-                  
-    print("Logistic Regression ({bi}/{ti}): loss logLikelihood={l}".format(bi=n_iter, ti=max_iters - 1, l=loss))
+        
+        # check for stopping criteria
+        n_iter = n_iter + 1
+        continue_ = n_iter < max_iters and np.linalg.norm(grad) > threshold
+        
+    print("Logistic Regression ({bi}/{ti}): loss logLikelihood={l}".format(bi=n_iter, ti=max_iters, l=loss))
            
     return w_tot, loss_tot
 
-def reg_logistic_regression(y, tx, initial_w, max_iters, gamma, method, lambda_):
+def reg_logistic_regression(y, tx, initial_w, max_iters, gamma, method, lambda_, threshold=1e-3):
     """ Minimization of the regularized likelihood through gradient descent (method = 'gd' or Newton method (method = 'newton'). """
     
     # initialization
     w_tot = [initial_w]
     loss_tot = []
+    n_iter = 0
+    continue_ = True
     
     # optimization loop
-    for n_iter in range(max_iters):
+    while continue_:
         
         if method == 'gd':
 
@@ -161,7 +187,11 @@ def reg_logistic_regression(y, tx, initial_w, max_iters, gamma, method, lambda_)
         # store w and loss
         w_tot.append(w)
         loss_tot.append(loss)       
-                  
-    print("Logistic Regression Regularized ({bi}/{ti}): loss loglikelihood={l}".format(bi=n_iter, ti=max_iters - 1, l=loss))
+        
+        # check for stopping criteria
+        n_iter = n_iter + 1
+        continue_ = n_iter < max_iters and np.linalg.norm(grad) > threshold
+        
+    print("Logistic Regression Regularized ({bi}/{ti}): loss loglikelihood={l}".format(bi=n_iter, ti=max_iters, l=loss))
            
     return w_tot, loss_tot
