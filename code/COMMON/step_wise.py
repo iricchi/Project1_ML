@@ -11,17 +11,14 @@ from cross_validation import *
 from costs import *
 
 
-def results_r2_stepwise(list_r2_adj,indices_features):
-    print("R2 asjusted values:")
+def results_r2_stepwise(list_r2_adj, indices_features):
     
     for i in range(len(list_r2_adj)):
-        print(list_r2_adj[i])
+        print('step', i+1, ': R2 adjusted =', list_r2_adj[i])
         
     print("-------------------------------------------------------")
     print("Number of features chosen:", len(indices_features))
-    print("\n")
     print("Indices of features chosen: ", indices_features)
-
 
 def stepwise(model, R2_method, all_candidates, features, Y, cv):
     
@@ -29,26 +26,47 @@ def stepwise(model, R2_method, all_candidates, features, Y, cv):
     num = all_candidates.shape[1]
     H = np.ones((n,1)) #offset
 
-    #Initialization only with offsets (lack of info)
+    # -------------------------------------------- Initialization only with offsets (lack of info)
     X = H
     k = 0 #needed for the R^2 adjusted
-
+    
     if model['method'] == 'ls':
-        w0, loss = least_squares(Y,X)  # The loss cannot be used as a measure for the feature selection because it's a 
+        
+        w0, loss = least_squares(Y,X)
         y = predict_labels(w0, X)
+        
     elif model['method'] == 'rr':
-        w0, loss = ridge_regression(Y,X,0)  # start with lambda = 0  
+        
+        w0, loss = ridge_regression(Y,X,0)  # initialize with lambda = 0  
         y = predict_labels(w0, X)
-    elif model['method'] == 'lr':
-        initial_w = np.ones(X.shape[1])
-        w0, loss = logistic_regression(Y,X, initial_w, model['max_iters'], model['gamma'], model['method_minimization'])
-        y = predict_labels(w0[-1], X)
+        
     elif model['method'] == 'lsgd':
+        
         initial_w = np.ones(X.shape[1])
-        w0, loss = least_squares_GD(Y,X, initial_w, model['max_iters'], model['gamma'], model['threshold'])
-        y = predict_labels(w0[-1], X)   
-        print('ok')
-
+        w0, loss = least_squares_GD(Y,X, initial_w, model['max_iters'], model['gamma'], model['threshold'], model['debug_mode'])
+        y = predict_labels(w0[-1], X)
+        
+    elif model['method'] == 'lssgd':
+        
+        initial_w = np.ones(X.shape[1])
+        w0, loss = least_squares_SGD(Y,X, initial_w, model['max_iters'], model['gamma'], model['batch_size'], model['threshold'],
+                                    model['debug_mode'])
+        y = predict_labels(w0[-1], X)
+        
+    elif model['method'] == 'lr':
+        
+        initial_w = np.ones(X.shape[1])
+        w0, loss = logistic_regression(Y,X, initial_w, model['max_iters'], model['gamma'], model['method_minimization'],
+                                       model['threshold'], model['debug_mode'])
+        y = predict_labels(w0[-1], X)
+        
+    elif model['method'] == 'lrr':
+        
+        initial_w = np.ones(X.shape[1])
+        w0, loss = reg_logistic_regression(Y,X, initial_w, model['max_iters'], model['gamma'], model['method_minimization'],
+                                        model['lambda_'], model['threshold'], model['debug_mode'])
+        y = predict_labels(w0[-1], X)
+        
     else:
         print('No correct type of model specified')
         
@@ -62,9 +80,9 @@ def stepwise(model, R2_method, all_candidates, features, Y, cv):
         y_ = X.dot(w0)
         R2 = 0
     elif R2_method == 'McFadden'  and model['method'] in ['ls', 'rr']:
-        loglike0 = compute_loglikelihood_reg(y,X,w0) #np.sum(np.log(1+np.exp(X.dot(w0))) - y*(X.dot(w0)))
+        loglike0 = compute_loglikelihood_reg(y,X,w0)
         R2 = 0 # definition = 1 - loglike0/loglike0 = 1 -1       
-    elif R2_method == 'McFadden' and model['method'] in ['lr', 'lsgd']:
+    elif R2_method == 'McFadden' and model['method'] in ['lsgd', 'lssgd', 'lr', 'lrr']:
         loglike0 = compute_loglikelihood_reg(y, X, w0[-1])
         R2 = 0
     else:
@@ -85,45 +103,66 @@ def stepwise(model, R2_method, all_candidates, features, Y, cv):
         for i in range(all_candidates.shape[1]):
 
             X = np.concatenate((H,all_candidates[:,i].reshape(n,1)), axis=1)
+            
             if cv == 0:
                 
                 if model['method'] == 'ls':
+                    
                     ws , loss = least_squares(Y,X)
                     y = predict_labels(ws, X)
+                    
                 elif model['method'] == 'rr':
-                    ws, loss = ridge_regression(Y,X,0)  # start with lambda = 0  
+                    
+                    ws, loss = ridge_regression(Y,X,model['lambda_'])
                     y = predict_labels(ws, X)
-                elif model['method'] == 'lr':
-                    initial_w = np.ones(X.shape[1])
-                    ws, loss = logistic_regression(Y,X, initial_w, model['max_iters'], model['gamma'], model['method_minimization'])
-                    y = predict_labels(ws[-1], X)
+                    
                 elif model['method']== 'lsgd':
+                    
                     initial_w = np.ones(X.shape[1])
-                    ws, loss = least_squares_GD(Y,X, initial_w, model['max_iters'], model['gamma'], model['threshold'])
-                    y = predict_labels(ws[-1], X)   
+                    ws, loss = least_squares_GD(Y,X, initial_w, model['max_iters'], model['gamma'], model['threshold'],
+                                                model['debug_mode'])
+                    y = predict_labels(ws[-1], X) 
+                    
+                elif model['method'] == 'lssgd':
+
+                    initial_w = np.ones(X.shape[1])
+                    ws, loss = least_squares_SGD(Y,X, initial_w, model['max_iters'], model['gamma'], model['batch_size'],
+                                                model['threshold'], model['debug_mode'])
+                    y = predict_labels(ws[-1], X)
+
+                elif model['method'] == 'lr':
+
+                    initial_w = np.ones(X.shape[1])
+                    ws, loss = logistic_regression(Y,X, initial_w, model['max_iters'], model['gamma'], model['method_minimization'],
+                                                   model['threshold'], model['debug_mode'])
+                    y = predict_labels(ws[-1], X)
+
+                elif model['method'] == 'lrr':
+
+                    initial_w = np.ones(X.shape[1])
+                    ws, loss = reg_logistic_regression(Y,X, initial_w, model['max_iters'], model['gamma'],
+                                                       model['method_minimization'], model['lambda_'], model['threshold'],
+                                                       model['debug_mode'])
+                    y = predict_labels(ws[-1], X)
+
                 else:
                     print('No correct type of model specified')
                     
             elif cv == 1:
                 
                 if model['method'] == 'ls':
+                    
                     w_tr_tot, loss_tr_tot, loss_te_tot = cross_validation(Y, X, model)
                     ws = w_tr_tot[np.argmin(loss_te_tot)]
                     loss = np.min(loss_te_tot)
                     y = predict_labels(ws, X)
-                elif model['method'] == 'rr':
+                    
+                elif model['method'] in ['rr', 'lsgd', 'lssgd', 'lr', 'lrr']:
+                    
                     ws, loss_tr, loss, lambda_opt = optimize_lambda(Y, X, model['lambda_min'], model['lambda_max'],
                                                                     model['lambda_steps'], model)
                     y = predict_labels(ws, X)
-                elif model['method'] == 'lr':
-                    ws, loss_tr, loss, lambda_opt = optimize_lambda(Y, X, model['lambda_min'], model['lambda_max'],
-                                                                    model['lambda_steps'], model)
-                    y = predict_labels(ws, X)
-                elif model['method']== 'lsgd':
-                    initial_w = np.ones(X.shape[1])
-                    ws, loss_tr, loss, lambda_opt = optimize_lambda(Y, X, model['lambda_min'], model['lambda_max'],
-                                                                    model['lambda_steps'], model)
-                    y = predict_labels(ws, X)  
+                    
                 else:
                     print('No correct type of model specified')    
                     
@@ -151,7 +190,7 @@ def stepwise(model, R2_method, all_candidates, features, Y, cv):
                 loglike = compute_loglikelihood_reg(y,X,ws)
                 R2 = 1-(loglike/loglike0)
                 
-            elif R2_method == 'McFadden' and model['method'] in ['lr', 'lsgd']:
+            elif R2_method == 'McFadden' and model['method'] in ['lsgd', 'lssgd', 'lr', 'lrr']:
                 
                 loglike = compute_loglikelihood_reg(y,X,ws[-1])
                 R2 = 1-(loglike/loglike0)

@@ -26,7 +26,7 @@ def ridge_regression(y, tx, lambda_):
     
     return wrr, loss
 
-def least_squares_GD(y, tx, initial_w, max_iters, gamma, threshold=1e-1, debug_mode=0):
+def least_squares_GD(y, tx, initial_w, max_iters, gamma, threshold=1e-2, debug_mode=0):
     """ Gradient descent algorithm for minimization of the mean squared error (mse). """
     
     # initialization
@@ -65,7 +65,7 @@ def least_squares_GD(y, tx, initial_w, max_iters, gamma, threshold=1e-1, debug_m
 
     return w_tot, loss_tot
     
-def least_squares_SGD(y, tx, initial_w, max_iters, gamma, batch_size, threshold=1e-1, debug_mode=0):
+def least_squares_SGD(y, tx, initial_w, max_iters, gamma, batch_size, threshold=1e-2, debug_mode=0):
     """ Stochastic gradient descent algorithm. """
     
     # initialization
@@ -113,7 +113,7 @@ def least_squares_SGD(y, tx, initial_w, max_iters, gamma, batch_size, threshold=
             
     return w_tot, loss_tot
 
-def logistic_regression(y, tx, initial_w, max_iters, gamma, method, threshold=1e-1, debug_mode=0):
+def logistic_regression(y, tx, initial_w, max_iters, gamma, method, threshold=1e-2, debug_mode=0):
     """ Minimization of the likelihood through gradient descent (method = 'gd' or Newton method (method = 'newton'). """
 
     # initialization
@@ -167,7 +167,7 @@ def logistic_regression(y, tx, initial_w, max_iters, gamma, method, threshold=1e
                        
     return w_tot, loss_tot
 
-def reg_logistic_regression(y, tx, initial_w, max_iters, gamma, method, lambda_, threshold=1e-1, debug_mode=0):
+def reg_logistic_regression(y, tx, initial_w, max_iters, gamma, method, lambda_, threshold=1e-2, debug_mode=0):
     """ Minimization of the regularized likelihood through gradient descent (method = 'gd' or Newton method (method = 'newton'). """
     
     # initialization
