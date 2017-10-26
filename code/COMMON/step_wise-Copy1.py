@@ -38,65 +38,50 @@ def stepwise(model, R2_method, all_candidates, features, y_true, cv):
     if model['method'] == 'ls':
         
         w0, loss = least_squares(y_true,X)
+        loglike0 = compute_loglikelihood_reg(y_true,X,w0)
+        R2 = 0 
         
     elif model['method'] == 'rr':
         
         w0, loss = ridge_regression(y_true,X,0)  # initialize with lambda = 0  
+        loglike0 = compute_loglikelihood_reg(y_true,X,w0)
+        R2 = 0 
         
     elif model['method'] == 'lsgd':
         
         initial_w = np.ones(X.shape[1])
-        w0, loss = least_squares_GD(y_true,X, initial_w, model['max_iters'], model['gamma'], model['threshold'], model['debug_mode'])
+        w0, loss = least_squares_GD(y_true,X, initial_w, model['max_iters'], model['gamma'], model['threshold'],
+                                    model['debug_mode'])
+        loglike0 = compute_loglikelihood_reg(y_true, X, w0[-1])
+        R2 = 0
         
     elif model['method'] == 'lssgd':
         
         initial_w = np.ones(X.shape[1])
-        w0, loss = least_squares_SGD(y_true,X, initial_w, model['max_iters'], model['gamma'], model['batch_size'], model['threshold'],
-                                    model['debug_mode'])
+        w0, loss = least_squares_SGD(y_true,X, initial_w, model['max_iters'], model['gamma'], model['batch_size'],
+                                     model['threshold'], model['debug_mode'])
+        loglike0 = compute_loglikelihood_reg(y_true, X, w0[-1])
+        R2 = 0
         
     elif model['method'] == 'lr':
         
         initial_w = np.ones(X.shape[1])
         w0, loss = logistic_regression(y_true,X, initial_w, model['max_iters'], model['gamma'], model['method_minimization'],
                                        model['threshold'], model['debug_mode'])
+        loglike0 = compute_loglikelihood_reg(y_true, X, w0[-1])
+        R2 = 0
         
     elif model['method'] == 'lrr':
         
         initial_w = np.ones(X.shape[1])
         w0, loss = reg_logistic_regression(y_true,X, initial_w, model['max_iters'], model['gamma'], model['method_minimization'],
                                         model['lambda_'], model['threshold'], model['debug_mode'])
-        
-    else:
-        print('No correct type of model specified')
-        
-
-    # get the R2 of reference
-    if R2_method == 'loss':
-        
-        sse = loss*2*numSamples
-        sst = np.sum((y_true - y_true.mean())**2)
-        R2 = np.abs((sst-sse)/sst)
-        
-    elif R2_method == 'Tjur':
-        
-        ind_back, ind_sig = idx_2labels(y_true, [0,1])
-        y_ = X.dot(w0)
-        R2 = 0
-        
-    elif R2_method == 'McFadden'  and model['method'] in ['ls', 'rr']:
-        
-        loglike0 = compute_loglikelihood_reg(y_true,X,w0)
-        R2 = 0 
-        
-    elif R2_method == 'McFadden' and model['method'] in ['lsgd', 'lssgd', 'lr', 'lrr']:
-        
         loglike0 = compute_loglikelihood_reg(y_true, X, w0[-1])
         R2 = 0
         
     else:
-        print('No correct method of R2 specified')
-        
-        
+        print('No correct type of model specified')
+               
 
     #fix the R2adj_max
     R2adj_0 = R2                # k = 0
