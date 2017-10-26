@@ -79,6 +79,9 @@ def optimize_degree(y, x, degree_min, degree_max, degree_steps, args, debug_mode
         # build polynomial basis function
         phi = build_poly(x, degree_tmp)
         
+        # update initial weights 
+        args['initial_w'] = np.zeros(phi.shape[1]) 
+        
         # cross validation with degree_tmp
         w_tr_tmp, loss_tr_tot_tmp, loss_te_tot_tmp = cross_validation(y, phi, args)
         

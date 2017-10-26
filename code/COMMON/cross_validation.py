@@ -58,7 +58,7 @@ def cross_validation_k(y, X, k_indices, k, args):
     if args['method'] == 'lr':
         
         w_tr_tot,_ = logistic_regression(y_tr, X_tr,args['initial_w'], args['max_iters'], args['gamma'], args['method_minimization'],
-                                       args['threshold'], args['debug_mode'])
+                                         args['threshold'], args['debug_mode'])
         w_tr = w_tr_tot[-1]
 
     # train with Regularized Logistic Regression
