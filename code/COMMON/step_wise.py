@@ -116,87 +116,68 @@ def stepwise(model, R2_method, all_candidates, features, y_true, cv):
             
             if cv == 0:
                 
-                # --------------------------------------- get the the model error (=loss) when training on the whole dataset
+                # # estimate the model error (=loglikelihood) when training on the whole dataset
                 if model['method'] == 'ls':
                     
-                    ws , loss = least_squares(y_true,X)
+                    ws,_ = least_squares(y_true,X)
                     
                 elif model['method'] == 'rr':
                     
-                    ws, loss = ridge_regression(y_true,X,model['lambda_'])
+                    ws,_ = ridge_regression(y_true,X,model['lambda_'])
                     
                 elif model['method']== 'lsgd':
                     
                     initial_w = np.ones(X.shape[1])
-                    ws_tot, loss_tot = least_squares_GD(y_true,X, initial_w, model['max_iters'], model['gamma'], model['threshold'],
+                    ws,_ = least_squares_GD(y_true,X, initial_w, model['max_iters'], model['gamma'], model['threshold'],
                                                 model['debug_mode'])
                     ws = ws_tot[-1]
 
                 elif model['method'] == 'lssgd':
 
                     initial_w = np.ones(X.shape[1])
-                    ws_tot, loss_tot = least_squares_SGD(y_true,X, initial_w, model['max_iters'], model['gamma'], model['batch_size'],
+                    ws_tot,_ = least_squares_SGD(y_true,X, initial_w, model['max_iters'], model['gamma'], model['batch_size'],
                                                 model['threshold'], model['debug_mode'])
-
                     ws = ws_tot[-1]
                     
                 elif model['method'] == 'lr':
 
                     initial_w = np.ones(X.shape[1])
-                    ws_tot, loss_tot = logistic_regression(y_true,X, initial_w, model['max_iters'], model['gamma'],
+                    ws_tot,_ = logistic_regression(y_true,X, initial_w, model['max_iters'], model['gamma'],
                                                    model['method_minimization'], model['threshold'], model['debug_mode'])
                     ws = ws_tot[-1]
 
                 elif model['method'] == 'lrr':
 
                     initial_w = np.ones(X.shape[1])
-                    ws_tot, loss_tot = reg_logistic_regression(y_true,X, initial_w, model['max_iters'], model['gamma'],
+                    ws_tot,_ = reg_logistic_regression(y_true,X, initial_w, model['max_iters'], model['gamma'],
                                                        model['method_minimization'], model['lambda_'], model['threshold'],
                                                        model['debug_mode'])
                     ws = ws_tot[-1]
                     
                 else:
+                    
                     print('No correct type of model specified')
                     
-                # --------------------------------------- compute R2 with the loss 
-                if R2_method == 'loss':
-                
-                    SSE = loss*2*numSamples
-                    SST = np.sum((y_true- y_true.mean())**2)
-                    R2 = np.abs((SST-SSE)/SST) 
-
-                elif R2_method == 'McFadden':
-                
-                    loglike = compute_loglikelihood_reg(y_true,X,ws)
-                    R2 = 1-(loglike/loglike0)
-
-                else:
-                    print('No correct method of R2 specified') 
- 
+                # compute R-squared McFadden
+                k = ws.shape[0]
+                loglike = compute_loglikelihood_reg(y_true,X,ws)
+                R2 = 1-(loglike/loglike0)
 
             elif cv == 1:
                 
-                # --------------------------------------- estimate the model error (=loss) with cross validation
+                # estimate the model error (=loglikelihood) with cross validation
                 w_tr_tot, loss_tr_tot, loss_te_tot = cross_validation(y_true, X, model)
                 loss = np.mean(loss_te_tot)
+                k = w_tr_tot[-1].shape[0]
                 
-                # --------------------------------------- compute R2 with the estimated loss 
-                if R2_method == 'loss':
-                
-                    SSE = loss*2*numSamples
-                    SST = np.sum((y_true- y_true.mean())**2)
-                    R2 = np.abs((SST-SSE)/SST) 
-                
-                elif R2_method == 'McFadden':
-                
-                    R2 = 1-(loss/loglike0)
+                # compute R-squared McFadden 
+                R2 = 1-(loss/loglike0)
                 
             else:
                 
                 print('No cross validation specified: cv = 0 or 1')
                 
                 
-            k = numFeat-1 
             R2_adj.append(R2 - (k/(numSamples-k-1)*(1-R2)))         
             
         R2adj_chosen = np.max(R2_adj)

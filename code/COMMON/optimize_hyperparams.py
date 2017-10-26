@@ -18,6 +18,7 @@ def optimize_lambda(y, x, lambda_min, lambda_max, lambda_steps, args, debug_mode
     # store mean losses from cross-validation from every lambda
     mean_loss_tr_all = []
     mean_loss_te_all = []
+    success_rate_all = []
 
     for lambda_tmp in lambda_set:
         
@@ -28,11 +29,12 @@ def optimize_lambda(y, x, lambda_min, lambda_max, lambda_steps, args, debug_mode
             print('------------------------------------------ cross validation with lambda_ = ', lambda_tmp)
 
         # cross validation with lambda_tmp
-        w_tr_tmp, loss_tr_tot_tmp, loss_te_tot_tmp = cross_validation(y, x, args)
+        w_tr_tmp, loss_tr_tot_tmp, loss_te_tot_tmp, success_rate = cross_validation(y, x, args)
         
-        # store mean losses
+        # store mean losses and success rates
         mean_loss_tr_all.append(np.mean(loss_tr_tot_tmp))
         mean_loss_te_all.append(np.mean(loss_te_tot_tmp))
+        success_rate_all.append(success_rate)
         
         # store the weights related to the minimum loss (testing loss)
         w_list.append(w_tr_tmp[np.argmin(loss_te_tot_tmp)])
@@ -50,7 +52,7 @@ def optimize_lambda(y, x, lambda_min, lambda_max, lambda_steps, args, debug_mode
         print('Optimal lambda: ', lambda_opt)
         print('Associated testing loss: ', loss_te, '\n')
 
-    return w_opt, loss_tr, loss_te, lambda_opt
+    return w_opt, loss_tr, loss_te, lambda_opt, np.mean(success_rate)
 
 def optimize_degree(y, x, degree_min, degree_max, degree_steps, args, debug_mode=0):
     """Optimization of the degree of the polynomial basis function. The best degree is chosen
@@ -64,6 +66,7 @@ def optimize_degree(y, x, degree_min, degree_max, degree_steps, args, debug_mode
     # store mean losses from cross validation for each degree
     mean_loss_tr_all = []
     mean_loss_te_all = []
+    success_rate_all = []
 
     # store weights
     w_list = []
@@ -83,11 +86,12 @@ def optimize_degree(y, x, degree_min, degree_max, degree_steps, args, debug_mode
         args['initial_w'] = np.zeros(phi.shape[1]) 
         
         # cross validation with degree_tmp
-        w_tr_tmp, loss_tr_tot_tmp, loss_te_tot_tmp = cross_validation(y, phi, args)
+        w_tr_tmp, loss_tr_tot_tmp, loss_te_tot_tmp, success_rate = cross_validation(y, phi, args)
         
         # store mean losses
         mean_loss_tr_all.append(np.mean(loss_tr_tot_tmp))
         mean_loss_te_all.append(np.mean(loss_te_tot_tmp))
+        success_rate_all.append(success_rate)
 
         # store the weights related to the minimum loss (testing loss)
         w_list.append(w_tr_tmp[np.argmin(loss_te_tot_tmp)])
@@ -105,7 +109,7 @@ def optimize_degree(y, x, degree_min, degree_max, degree_steps, args, debug_mode
         print('Optimal degree: ', degree_opt)
         print('Associated testing loss: ', loss_te, '\n')
 
-    return w_opt, loss_tr, loss_te, degree_opt
+    return w_opt, loss_tr, loss_te, degree_opt, np.mean(success_rate)
 
 def optimize_gamma(y, x, gamma_min, gamma_max, gamma_steps, args, debug_mode=0):
     """Optimization of the step gamma in descent based minimization algorithm (gradient descent 
@@ -119,6 +123,7 @@ def optimize_gamma(y, x, gamma_min, gamma_max, gamma_steps, args, debug_mode=0):
     # store mean losses
     mean_loss_tr_all = []
     mean_loss_te_all = []
+    success_rate_all = []
 
     # store weights
     w_list = []
@@ -132,11 +137,12 @@ def optimize_gamma(y, x, gamma_min, gamma_max, gamma_steps, args, debug_mode=0):
             print('------------------------------------------ cross validation with gamma = ', gamma_tmp)
         
         # cross validation with gamma_tmp
-        w_tr_tmp, loss_tr_tot_tmp, loss_te_tot_tmp = cross_validation(y, x, args)
+        w_tr_tmp, loss_tr_tot_tmp, loss_te_tot_tmp, success_rate = cross_validation(y, x, args)
         
         # store mean losses
         mean_loss_tr_all.append(np.mean(loss_tr_tot_tmp))
         mean_loss_te_all.append(np.mean(loss_te_tot_tmp))
+        success_rate_all.append(success_rate)
 
         # store the weights related to the minimum loss (testing loss)
         w_list.append(w_tr_tmp[np.argmin(loss_te_tot_tmp)])
@@ -154,4 +160,4 @@ def optimize_gamma(y, x, gamma_min, gamma_max, gamma_steps, args, debug_mode=0):
         print('Optimal gamma: ', gamma_opt)
         print('Associated testing loss: ', loss_te, '\n')
 
-    return w_opt, loss_tr, loss_te, gamma_opt
+    return w_opt, loss_tr, loss_te, gamma_opt, np.mean(success_rate)
