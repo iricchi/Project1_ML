@@ -154,7 +154,7 @@ def stepwise(model, R2_method = 'McFadden', all_candidates, features, y_true, cv
             elif cv == 1:
                 
                 # estimate the model error (=loglikelihood) with cross validation
-                w_tr_tot, loss_tr_tot, loss_te_tot,  = cross_validation(y_true, X, model)
+                w_tr_tot, loss_tr_tot, loss_te_tot, success_rate  = cross_validation(y_true, X, model)
                 loss = np.mean(loss_te_tot)
                 k = w_tr_tot[-1].shape[0]
                 
