@@ -45,25 +45,29 @@ def cross_validation_k(y, X, k_indices, k, args):
     # train with Least Squares Gradient Descent
     if args['method'] == 'lsgd':
         
-        w_tr_tot,_ = least_squares_GD(y_tr, X_tr, args['initial_w'], args['max_iters'], args['gamma'])
+        w_tr_tot,_ = least_squares_GD(y_tr, X_tr, args['initial_w'], args['max_iters'], args['gamma'], args['threshold'],
+                                      args['debug_mode'])
         w_tr = w_tr_tot[-1]
     
     # train with Least Squares Stochastic Gradient Descent
     if args['method'] == 'lssgd':
         
-        w_tr_tot,_ = least_squares_SGD(y_tr, X_tr, args['initial_w'], args['max_iters'], args['gamma'], args['batch_size'])
+        w_tr_tot,_ = least_squares_SGD(y_tr, X_tr, args['initial_w'], args['max_iters'], args['gamma'], args['batch_size'],
+                                       args['threshold'], args['debug_mode'])
         w_tr = w_tr_tot[-1]
     
     # train with Logistic Regression
     if args['method'] == 'lr':
         
-        w_tr_tot,_ = logistic_regression(y_tr, X_tr,args['initial_w'], args['max_iters'], args['gamma'], args['method_minimization'])
+        w_tr_tot,_ = logistic_regression(y_tr, X_tr,args['initial_w'], args['max_iters'], args['gamma'], args['method_minimization'],
+                                         args['threshold'], args['debug_mode'])
         w_tr = w_tr_tot[-1]
 
     # train with Regularized Logistic Regression
     if args['method'] == 'lrr':
-        
-        w_tr_tot,_ = reg_logistic_regression(y_tr, X_tr,args['initial_w'], args['max_iters'], args['gamma'], args['method_minimization'],                                                args['lambda_'])
+       
+        w_tr_tot,_ = reg_logistic_regression(y_tr, X_tr,args['initial_w'], args['max_iters'], args['gamma'],
+                                             args['method_minimization'], args['lambda_'], args['threshold'], args['debug_mode'])
         w_tr = w_tr_tot[-1]
         
     # check if regularization 

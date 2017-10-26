@@ -24,6 +24,7 @@ def optimize_lambda(y, x, lambda_min, lambda_max, lambda_steps, args, debug_mode
         
         # update lambda_ in the model
         args['lambda_'] = lambda_tmp
+        
         if debug_mode:
             print('------------------------------------------ cross validation with lambda_ = ', lambda_tmp)
 
@@ -46,7 +47,6 @@ def optimize_lambda(y, x, lambda_min, lambda_max, lambda_steps, args, debug_mode
     loss_tr = mean_loss_tr_all[best_indx]
     loss_te = mean_loss_te_all[best_indx]
     
-    # results
     if debug_mode:
         cross_validation_visualization_lambda(lambda_set, mean_loss_tr_all, mean_loss_te_all)
         print('Optimal lambda: ', lambda_opt)
@@ -75,11 +75,15 @@ def optimize_degree(y, x, degree_min, degree_max, degree_steps, args, debug_mode
         
         # update degree in the model
         args['degree'] = degree_tmp
+        
         if debug_mode:
             print('------------------------------------------ cross validation with degree = ', degree_tmp)
 
         # build polynomial basis function
         phi = build_poly(x, degree_tmp)
+        
+        # update initial weights 
+        args['initial_w'] = np.zeros(phi.shape[1]) 
         
         # cross validation with degree_tmp
         w_tr_tmp, loss_tr_tot_tmp, loss_te_tot_tmp, success_rate = cross_validation(y, phi, args)
@@ -100,7 +104,6 @@ def optimize_degree(y, x, degree_min, degree_max, degree_steps, args, debug_mode
     loss_tr = mean_loss_tr_all[best_indx]
     loss_te = mean_loss_te_all[best_indx]
     
-    # results
     if debug_mode:
         cross_validation_visualization_degree(degree_set, mean_loss_tr_all, mean_loss_te_all)
         print('Optimal degree: ', degree_opt)
@@ -128,6 +131,7 @@ def optimize_gamma(y, x, gamma_min, gamma_max, gamma_steps, args, debug_mode=0):
         
         # update gamma in the model
         args['gamma'] = gamma_tmp
+        
         if debug_mode:
             print('------------------------------------------ cross validation with gamma = ', gamma_tmp)
         
@@ -149,7 +153,6 @@ def optimize_gamma(y, x, gamma_min, gamma_max, gamma_steps, args, debug_mode=0):
     loss_tr = mean_loss_tr_all[best_indx]
     loss_te = mean_loss_te_all[best_indx]
     
-    # results
     if debug_mode:
         cross_validation_visualization_gamma(gamma_set, mean_loss_tr_all, mean_loss_te_all)
         print('Optimal gamma: ', gamma_opt)

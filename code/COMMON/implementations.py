@@ -2,6 +2,7 @@ import numpy as np
 from costs import *
 from compute_gradient import *
 from proj1_helpers import batch_iter
+import matplotlib.pyplot as plt
 
 def least_squares(y, tx):
     """Minimization of the mean squared error."""
@@ -25,18 +26,23 @@ def ridge_regression(y, tx, lambda_):
     
     return wrr, loss
 
-def least_squares_GD(y, tx, initial_w, max_iters, gamma):
+def least_squares_GD(y, tx, initial_w, max_iters, gamma, threshold=1e-2, debug_mode=0):
     """ Gradient descent algorithm for minimization of the mean squared error (mse). """
     
     # initialization
     w_tot = [initial_w]
     loss_tot = []
-
+    n_iter = 0
+    continue_ = True
+    
     # optimization loop
-    for n_iter in range(max_iters):
+    while continue_:
 
+        # compute gradient
+        grad = compute_gradient_mse(y, tx, w_tot[-1])
+        
         # update w
-        w = w_tot[-1] - gamma*compute_gradient_mse(y, tx, w_tot[-1])
+        w = w_tot[-1] - gamma*grad
 
         # get new loss
         loss = compute_mse_reg(y, tx, w)        
@@ -45,19 +51,42 @@ def least_squares_GD(y, tx, initial_w, max_iters, gamma):
         w_tot.append(w)
         loss_tot.append(loss)
 
-    print("Gradient Descent({bi}/{ti}): loss MSE={l}".format(bi=n_iter, ti=max_iters - 1, l=loss))
+        # check for stopping criteria
+        n_iter = n_iter + 1
+        continue_ = n_iter < max_iters and  np.linalg.norm(grad) > threshold
+            
+        if debug_mode and n_iter % 100 == 0:
+        
+            # norm of the grad
+            print('n_iter:', n_iter, ', ||grad|| =', np.linalg.norm(grad))
 
+            # check if convergence
+            plt.plot(loss_tot)
+            plt.xlabel('iteration')
+            plt.ylabel('likelihood')
+            plt.show()
+            
+    if debug_mode:
+        
+        # check if convergence
+        print('--------------------- final iteration')
+        plt.plot(loss_tot)
+        plt.xlabel('iteration')
+        plt.ylabel('likelihood')
+        plt.show()
     return w_tot, loss_tot
     
-def least_squares_SGD(y, tx, initial_w, max_iters, gamma, batch_size):
+def least_squares_SGD(y, tx, initial_w, max_iters, gamma, batch_size, threshold=1e-2, debug_mode=0):
     """ Stochastic gradient descent algorithm. """
     
     # initialization
     w_tot = [initial_w]
     loss_tot = []
+    n_iter = 0
+    continue_ = True
     
     # optimization loop
-    for n_iter in range(max_iters):
+    while continue_:
                 
         # pick randomly samples
         batches = batch_iter(y, tx, batch_size, num_batches=1, shuffle=True)
@@ -68,8 +97,11 @@ def least_squares_SGD(y, tx, initial_w, max_iters, gamma, batch_size):
             y_tmp = samples[0]
             tx_tmp = samples[1]
         
+            # compute gradient
+            grad = compute_gradient_mse(y_tmp, tx_tmp, w_tot[-1])
+            
             # update w
-            w = w_tot[-1] - gamma*compute_gradient_mse(y_tmp, tx_tmp, w_tot[-1])
+            w = w_tot[-1] - gamma*grad
             
             # get new loss
             loss = compute_mse_reg(y_tmp, tx_tmp, w)        
@@ -78,19 +110,43 @@ def least_squares_SGD(y, tx, initial_w, max_iters, gamma, batch_size):
         w_tot.append(w)
         loss_tot.append(loss)
         
-    print("Stochastic Gradient Descent({bi}/{ti}): loss MSE={l}".format(bi=n_iter, ti=max_iters - 1, l=loss))
+        # check for stopping criteria
+        n_iter = n_iter + 1
+        continue_ = n_iter < max_iters and  np.linalg.norm(grad) > threshold
+            
+        if debug_mode and n_iter % 100 == 0:
+        
+            # norm of the grad
+            print('n_iter:', n_iter, ', ||grad|| =', np.linalg.norm(grad))
 
+            # check if convergence
+            plt.plot(loss_tot)
+            plt.xlabel('iteration')
+            plt.ylabel('likelihood')
+            plt.show()
+            
+    if debug_mode:
+        
+        # check if convergence
+        print('--------------------- final iteration')
+        plt.plot(loss_tot)
+        plt.xlabel('iteration')
+        plt.ylabel('likelihood')
+        plt.show()
+            
     return w_tot, loss_tot
 
-def logistic_regression(y, tx, initial_w, max_iters, gamma, method):
+def logistic_regression(y, tx, initial_w, max_iters, gamma, method, threshold=1e-2, debug_mode=0):
     """ Minimization of the likelihood through gradient descent (method = 'gd' or Newton method (method = 'newton'). """
-    
+
     # initialization
     w_tot = [initial_w]
     loss_tot = []
+    n_iter = 0
+    continue_ = True
     
     # optimization loop
-    for n_iter in range(max_iters):
+    while continue_:
         
         if method == 'gd':
 
@@ -110,7 +166,7 @@ def logistic_regression(y, tx, initial_w, max_iters, gamma, method):
             w = np.linalg.solve(hess, hess.dot(w_tot[-1])-gamma*grad)
 
         else:
-            print('The variable method has to be "gradient_descent" or "newton".')
+            print('The variable method has to be "gd" or "newton".')
             break
 
         # get new loss
@@ -119,20 +175,44 @@ def logistic_regression(y, tx, initial_w, max_iters, gamma, method):
         # store w and loss
         w_tot.append(w)
         loss_tot.append(loss)       
-                  
-    print("Logistic Regression ({bi}/{ti}): loss logLikelihood={l}".format(bi=n_iter, ti=max_iters - 1, l=loss))
-           
+        
+        # check for stopping criteria
+        n_iter = n_iter + 1
+        continue_ = n_iter < max_iters and  np.linalg.norm(grad) > threshold
+            
+        if debug_mode and n_iter % 100 == 0:
+        
+            # norm of the grad
+            print('n_iter:', n_iter, ', ||grad|| =', np.linalg.norm(grad))
+
+            # check if convergence
+            plt.plot(loss_tot)
+            plt.xlabel('iteration')
+            plt.ylabel('likelihood')
+            plt.show()
+            
+    if debug_mode:
+        
+        # check if convergence
+        print('--------------------- final iteration')
+        plt.plot(loss_tot)
+        plt.xlabel('iteration')
+        plt.ylabel('likelihood')
+        plt.show()
+                       
     return w_tot, loss_tot
 
-def reg_logistic_regression(y, tx, initial_w, max_iters, gamma, method, lambda_):
+def reg_logistic_regression(y, tx, initial_w, max_iters, gamma, method, lambda_, threshold=1e-2, debug_mode=0):
     """ Minimization of the regularized likelihood through gradient descent (method = 'gd' or Newton method (method = 'newton'). """
     
     # initialization
     w_tot = [initial_w]
     loss_tot = []
+    n_iter = 0
+    continue_ = True
     
     # optimization loop
-    for n_iter in range(max_iters):
+    while continue_:
         
         if method == 'gd':
 
@@ -152,7 +232,7 @@ def reg_logistic_regression(y, tx, initial_w, max_iters, gamma, method, lambda_)
             w = np.linalg.solve(hess, hess.dot(w_tot[-1])-gamma*grad)
             
         else:
-            print('The variable method has to be "gradient_descent" or "newton".')
+            print('The variable method has to be "gd" or "newton".')
             break
 
         # get new regularized loss
@@ -161,7 +241,29 @@ def reg_logistic_regression(y, tx, initial_w, max_iters, gamma, method, lambda_)
         # store w and loss
         w_tot.append(w)
         loss_tot.append(loss)       
-                  
-    print("Logistic Regression Regularized ({bi}/{ti}): loss loglikelihood={l}".format(bi=n_iter, ti=max_iters - 1, l=loss))
-           
+        
+        # check for stopping criteria
+        n_iter = n_iter + 1
+        continue_ = n_iter < max_iters and  np.linalg.norm(grad) > threshold
+            
+        if debug_mode and n_iter % 100 == 0:
+        
+            # norm of the grad
+            print('n_iter:', n_iter, ', ||grad|| =', np.linalg.norm(grad))
+
+            # check if convergence
+            plt.plot(loss_tot)
+            plt.xlabel('iteration')
+            plt.ylabel('likelihood')
+            plt.show()
+            
+    if debug_mode:
+        
+        # check if convergence
+        print('--------------------- final iteration')
+        plt.plot(loss_tot)
+        plt.xlabel('iteration')
+        plt.ylabel('likelihood')
+        plt.show()
+            
     return w_tot, loss_tot
