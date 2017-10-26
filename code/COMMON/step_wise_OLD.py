@@ -92,7 +92,7 @@ def stepwise(model, R2_method, all_candidates, features, y_true, cv):
         
   
     #fix the R2adj_max
-    R2adj_0 = R2 - (k/(n-k-1)*(1-R2))
+    R2adj_0 = R2            # k = 0
     R2adj_max = R2adj_0
     ind_max = 0  # this index will show us which is the best feature chosen
     del(X)
@@ -163,7 +163,7 @@ def stepwise(model, R2_method, all_candidates, features, y_true, cv):
                 elif R2_method == 'McFadden':
                 
                     loglike = compute_loglikelihood_reg(y_true,X,ws)
-                    R2 = 1-(loglike-k/loglike0)
+                    R2 = 1-((loglike-k)/loglike0)
                     
                 else:
                     print('No correct method of R2 specified') 
@@ -184,7 +184,7 @@ def stepwise(model, R2_method, all_candidates, features, y_true, cv):
                 
                 elif R2_method == 'McFadden':
                 
-                    R2 = 1-(loss/loglike0)
+                    R2 = 1-((loss-k)/loglike0)
                 
             else:
                 
