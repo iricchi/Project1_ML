@@ -53,16 +53,27 @@ def least_squares_GD(y, tx, initial_w, max_iters, gamma, threshold=1e-2, debug_m
 
         # check for stopping criteria
         n_iter = n_iter + 1
-        continue_ = n_iter < max_iters and np.linalg.norm(grad) > threshold
+        continue_ = n_iter < max_iters and  np.linalg.norm(grad) > threshold
+            
+        if debug_mode and n_iter % 100 == 0:
         
+            # norm of the grad
+            print('n_iter:', n_iter, ', ||grad|| =', np.linalg.norm(grad))
+
+            # check if convergence
+            plt.plot(loss_tot)
+            plt.xlabel('iteration')
+            plt.ylabel('likelihood')
+            plt.show()
+            
     if debug_mode:
-    
+        
         # check if convergence
+        print('--------------------- final iteration')
         plt.plot(loss_tot)
         plt.xlabel('iteration')
-        plt.ylabel('Mean Squared Error')
-        plt.show() 
-
+        plt.ylabel('likelihood')
+        plt.show()
     return w_tot, loss_tot
     
 def least_squares_SGD(y, tx, initial_w, max_iters, gamma, batch_size, threshold=1e-2, debug_mode=0):
@@ -101,15 +112,27 @@ def least_squares_SGD(y, tx, initial_w, max_iters, gamma, batch_size, threshold=
         
         # check for stopping criteria
         n_iter = n_iter + 1
-        continue_ = n_iter < max_iters and np.linalg.norm(grad) > threshold
+        continue_ = n_iter < max_iters and  np.linalg.norm(grad) > threshold
+            
+        if debug_mode and n_iter % 100 == 0:
         
+            # norm of the grad
+            print('n_iter:', n_iter, ', ||grad|| =', np.linalg.norm(grad))
+
+            # check if convergence
+            plt.plot(loss_tot)
+            plt.xlabel('iteration')
+            plt.ylabel('likelihood')
+            plt.show()
+            
     if debug_mode:
-    
+        
         # check if convergence
+        print('--------------------- final iteration')
         plt.plot(loss_tot)
         plt.xlabel('iteration')
-        plt.ylabel('Mean Squared Error')
-        plt.show() 
+        plt.ylabel('likelihood')
+        plt.show()
             
     return w_tot, loss_tot
 
@@ -155,17 +178,27 @@ def logistic_regression(y, tx, initial_w, max_iters, gamma, method, threshold=1e
         
         # check for stopping criteria
         n_iter = n_iter + 1
-        continue_ = n_iter < max_iters and np.linalg.norm(grad) > threshold
-        
+        continue_ = n_iter < max_iters and  np.linalg.norm(grad) > threshold
+            
         if debug_mode and n_iter % 100 == 0:
         
             # norm of the grad
-            print('n_iter:', n_iter, '||grad|| =:', np.linalg.norm(grad))
+            print('n_iter:', n_iter, ', ||grad|| =', np.linalg.norm(grad))
 
             # check if convergence
             plt.plot(loss_tot)
             plt.xlabel('iteration')
             plt.ylabel('likelihood')
+            plt.show()
+            
+    if debug_mode:
+        
+        # check if convergence
+        print('--------------------- final iteration')
+        plt.plot(loss_tot)
+        plt.xlabel('iteration')
+        plt.ylabel('likelihood')
+        plt.show()
                        
     return w_tot, loss_tot
 
@@ -211,14 +244,12 @@ def reg_logistic_regression(y, tx, initial_w, max_iters, gamma, method, lambda_,
         
         # check for stopping criteria
         n_iter = n_iter + 1
-        if n_iter > 2:
-            Dloss = abs(loss_tot[-1] - loss_tot[-2])
-            continue_ = n_iter < max_iters and  Dloss > threshold
+        continue_ = n_iter < max_iters and  np.linalg.norm(grad) > threshold
             
         if debug_mode and n_iter % 100 == 0:
         
             # norm of the grad
-            print('n_iter:', n_iter, ', Dloss =', Dloss)
+            print('n_iter:', n_iter, ', ||grad|| =', np.linalg.norm(grad))
 
             # check if convergence
             plt.plot(loss_tot)
@@ -229,6 +260,7 @@ def reg_logistic_regression(y, tx, initial_w, max_iters, gamma, method, lambda_,
     if debug_mode:
         
         # check if convergence
+        print('--------------------- final iteration')
         plt.plot(loss_tot)
         plt.xlabel('iteration')
         plt.ylabel('likelihood')
