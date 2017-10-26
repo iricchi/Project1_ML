@@ -1,6 +1,8 @@
 import numpy as np
 from implementations import *
-from proj1_helpers import predict_labels
+from proj1_helpers import *
+from sigmoid import *
+
 
 def build_k_indices(num_samples, k_fold, seed=0, debug_mode=0):
     """build k indices for k-fold."""
@@ -61,7 +63,7 @@ def cross_validation_k(y, X, k_indices, k, args):
     # train with Regularized Logistic Regression
     if args['method'] == 'lrr':
         
-        w_tr_tot,_ = reg_logistic_regression(y_tr, X_tr,args['initial_w'], args['max_iters'], args['gamma'], args['method_minimization'], args['lambda_'])
+        w_tr_tot,_ = reg_logistic_regression(y_tr, X_tr,args['initial_w'], args['max_iters'], args['gamma'], args['method_minimization'],                                                args['lambda_'])
         w_tr = w_tr_tot[-1]
         
     # check if regularization 
@@ -74,8 +76,8 @@ def cross_validation_k(y, X, k_indices, k, args):
     if args['loss'] == 'rmse':
 
         loss_tr = np.sqrt(2*compute_mse_reg(y_tr, X_tr, w_tr, lambda_))
-        loss_te = np.sqrt(2*compute_mse_reg(y_te, X_te, w_tr, lambda_))
-
+        loss_te = np.sqrt(2*compute_mse_reg(y_te, X_te, w_tr, lambda_))        
+        
     if args['loss'] == 'mae':
 
         loss_tr = compute_mae_reg(y_tr, X_tr, w_tr, lambda_)
@@ -86,7 +88,24 @@ def cross_validation_k(y, X, k_indices, k, args):
         loss_tr = compute_loglikelihood_reg(y_tr, X_tr, w_tr, lambda_)
         loss_te = compute_loglikelihood_reg(y_te, X_te, w_tr, lambda_)
         
-    return w_tr, loss_tr, loss_te
+    #compute success rateo
+    if args['method'] == 'lr' or args['method'] == 'lrr':
+        y_model = predict_labels_log(w_tr, X_te)
+    else:
+        y_model = predict_labels(w_tr, X_te)
+        
+    pos = 0
+    neg = 0
+    for i in range (len(y_model)):
+        if y_te[i] == y_model[i]:
+            pos += 1
+        else:
+            neg += 1
+
+    success_rate = pos/(pos+neg)
+    print(success_rate)
+    
+    return w_tr, loss_tr, loss_te, success_rate
     
 def cross_validation(y, X, args, debug_mode=0):
             
@@ -94,6 +113,7 @@ def cross_validation(y, X, args, debug_mode=0):
     w_tr_tot = []
     loss_tr_tot = []
     loss_te_tot = []
+    success_rate_tot = []
 
     # build k folds of indices 
     num_samples = y.shape[0]
@@ -103,15 +123,16 @@ def cross_validation(y, X, args, debug_mode=0):
     for k in range(args['k_fold']):        
         
         # k'th train and test
-        w_tr_k, loss_tr_k, loss_te_k = cross_validation_k(y, X, k_indices, k, args)
+        w_tr_k, loss_tr_k, loss_te_k, success_rate = cross_validation_k(y, X, k_indices, k, args)
         
         # store weights and losses
         w_tr_tot.append(w_tr_k)
         loss_tr_tot.append(loss_tr_k)
         loss_te_tot.append(loss_te_k)
+        success_rate_tot.append(success_rate)
 
     if debug_mode:
         print('Mean training loss: ', np.mean(loss_tr_tot))
         print('Mean testing loss: ', np.mean(loss_te_tot))
 
-    return w_tr_tot, loss_tr_tot, loss_te_tot
+    return w_tr_tot, loss_tr_tot, loss_te_tot, np.mean(success_rate_tot)
