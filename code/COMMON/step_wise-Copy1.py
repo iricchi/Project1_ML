@@ -21,8 +21,15 @@ def results_r2_stepwise(list_r2_adj, indices_features):
     print("Indices of features chosen: ", indices_features)
 
     
-def stepwise(model, R2_method, all_candidates, features, y_true, cv):
-    
+def stepwise(model, R2_method = 'McFadden', all_candidates, features, y_true, cv):
+    """
+    Stepwise function takes in input the model dictionary and the R2_method, which we have fixed
+    with McFadden (Pseudo R2). 
+    The algorithm does a forward elimination: starting with no variables in the model, it tests 
+    the addition of each variable using a chosen model fit criterion, adding the variable (if any)
+    whose inclusion gives the most statistically significant improvement of the fit, and repeating 
+    this process until none improves the model to a statistically significant extent.    
+    """
     # data set sizes
     numSamples = all_candidates.shape[0]
     numFeat = all_candidates.shape[1]
@@ -32,6 +39,7 @@ def stepwise(model, R2_method, all_candidates, features, y_true, cv):
 
     # initialization (only with the offset: lack of info)
     X = H
+    # k = number of features chosen, used to comput R2 adjusted
     k = 0
     
     # fit with the offset
@@ -84,7 +92,7 @@ def stepwise(model, R2_method, all_candidates, features, y_true, cv):
                
 
     #fix the R2adj_max
-    R2adj_0 = R2                # k = 0
+    R2adj_0 = R2               
     R2adj_max = R2adj_0
     ind_max = 0  # best feature index
     del(X)
@@ -96,9 +104,9 @@ def stepwise(model, R2_method, all_candidates, features, y_true, cv):
         R2_adj = []
         
         for i in range(all_candidates.shape[1]):
-
+            # increase the features 
             X = np.concatenate((H,all_candidates[:,i].reshape(numSamples,1)), axis=1)
-            k = X.shape[1] - 1
+            k = X.shape[1] - 1   # the ones column (offset) is not considered
             
             if cv == 0:
                 
@@ -163,8 +171,9 @@ def stepwise(model, R2_method, all_candidates, features, y_true, cv):
                 print('No cross validation specified: cv = 0 or 1')
                 
                 
-            R2_adj.append(R2)         
+            R2_adj.append(R2)
             
+        # take the best R2   
         R2adj_chosen = np.max(R2_adj)
         best_R2adj.append(R2adj_chosen)
         idx_chosen = np.argmax(R2_adj)
@@ -173,12 +182,14 @@ def stepwise(model, R2_method, all_candidates, features, y_true, cv):
             
             R2adj_max = R2adj_chosen
             ind_max = idx_chosen
+            # realloc of H with the regressor chosen so that X will be build with the new H and another potential candidate
             H = np.concatenate((H, all_candidates[:,ind_max].reshape(numSamples,1)), axis = 1)
             all_candidates = np.delete(all_candidates,ind_max,1)
             
             print('-------------------------------------------------')
             print('Feature chosen: ', features[ind_max][1], '(index :', features[ind_max][0], ')')
             idx_features.append(features[ind_max][0])
+            #deleting the feature chosen in order not to have the combination with the same features
             del(features[ind_max])
             del(X)
 
