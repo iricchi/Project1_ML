@@ -155,6 +155,7 @@ def stepwise(model, R2_method, all_candidates, features, y_true, cv):
             elif cv == 1:
                 
                 # estimate the model error (=loglikelihood) with cross validation
+                model['initial_w'] = np.ones(X.shape[1])
                 w_tr_tot, loss_tr_tot, loss_te_tot, success_rate  = cross_validation(y_true, X, model)
                 loss = np.mean(loss_te_tot)
                 
