@@ -139,13 +139,13 @@ def stepwise(model, R2_method, all_candidates, features, y_true, cv):
                 elif model['method'] == 'lr':
 
                     initial_w = np.ones(X.shape[1])
-                    ws, loss = logistic_regression(Y,X, initial_w, model['max_iters'], model['gamma'], model['method_minimization'],
-                                                   model['threshold'], model['debug_mode'])
+                    ws, loss = logistic_regression(y_true,X, initial_w, model['max_iters'], model['gamma'],
+                                                   model['method_minimization'], model['threshold'], model['debug_mode'])
 
                 elif model['method'] == 'lrr':
 
                     initial_w = np.ones(X.shape[1])
-                    ws, loss = reg_logistic_regression(Y,X, initial_w, model['max_iters'], model['gamma'],
+                    ws, loss = reg_logistic_regression(y_true,X, initial_w, model['max_iters'], model['gamma'],
                                                        model['method_minimization'], model['lambda_'], model['threshold'],
                                                        model['debug_mode'])
                 else:
@@ -161,7 +161,7 @@ def stepwise(model, R2_method, all_candidates, features, y_true, cv):
                     
                 elif model['method'] in ['rr', 'lsgd', 'lssgd', 'lr', 'lrr']:
                     
-                    ws, loss_tr, loss, lambda_opt = optimize_lambda(Y, X, model['lambda_min'], model['lambda_max'],
+                    ws, loss_tr, loss, lambda_opt = optimize_lambda(y_true, X, model['lambda_min'], model['lambda_max'],
                                                                     model['lambda_steps'], model)
                     
                 else:

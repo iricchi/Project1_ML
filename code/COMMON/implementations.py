@@ -197,7 +197,7 @@ def reg_logistic_regression(y, tx, initial_w, max_iters, gamma, method, lambda_,
             w = np.linalg.solve(hess, hess.dot(w_tot[-1])-gamma*grad)
             
         else:
-            print('The variable method has to be "gradient_descent" or "newton".')
+            print('The variable method has to be "gd" or "newton".')
             break
 
         # get new regularized loss
