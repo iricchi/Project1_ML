@@ -150,24 +150,23 @@ def stepwise(model, R2_method, all_candidates, features, y_true, cv):
                     
                 # compute R-squared McFadden
                 loglike = compute_loglikelihood_reg(y_true,X,ws)
-                R2 = 1-((loglike-k)/loglike0)
+                R2 = 1-(loglike/loglike0)
 
             elif cv == 1:
                 
                 # estimate the model error (=loglikelihood) with cross validation
                 w_tr_tot, loss_tr_tot, loss_te_tot, success_rate  = cross_validation(y_true, X, model)
                 loss = np.mean(loss_te_tot)
-                k = w_tr_tot[-1].shape[0]
                 
                 # compute R-squared McFadden 
-                R2 = 1-((loss-k)/loglike0)
+                R2 = 1-(loss/loglike0)
                 
             else:
                 
                 print('No cross validation specified: cv = 0 or 1')
                 
-                
-            R2_adj.append(R2)
+            # correction depending on the number of features and of samples   
+            R2_adj.append(R2 - (k/(numSamples-k-1)*(1-R2)))
             
         # take the best R2   
         R2adj_chosen = np.max(R2_adj)
