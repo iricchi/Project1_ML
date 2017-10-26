@@ -21,7 +21,8 @@ def results_r2_stepwise(list_r2_adj, indices_features):
     print("Indices of features chosen: ", indices_features)
 
     
-def stepwise(model, R2_method = 'McFadden', all_candidates, features, y_true, cv):
+def stepwise(model, R2_method, all_candidates, features, y_true, cv):
+    
     """
     Stepwise function takes in input the model dictionary and the R2_method, which we have fixed
     with McFadden (Pseudo R2). 
