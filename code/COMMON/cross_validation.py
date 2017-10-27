@@ -107,7 +107,9 @@ def cross_validation_k(y, X, k_indices, k, args):
             neg += 1
 
     success_rate = pos/(pos+neg)
-    print(success_rate)
+    
+    if args['debug_mode']:
+        print(success_rate)
     
     return w_tr, loss_tr, loss_te, success_rate
     
