@@ -38,4 +38,9 @@ def extend_features(X, feature_names, degree, is_add_log = False, index_log = [0
     print('Data have been standardized.')
     print('---------------------------')
 
-    return X_ext, features_names_ext
+    # list of feature names and indices
+    features_ext = []
+    for i in range(len(features_names_ext)):
+        features_ext.append((i,features_names_ext[i]))
+    
+    return X_ext, features_ext
