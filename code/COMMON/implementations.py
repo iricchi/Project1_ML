@@ -55,7 +55,7 @@ def least_squares_GD(y, tx, initial_w, max_iters, gamma, threshold=1e-2, debug_m
         n_iter = n_iter + 1
         continue_ = n_iter < max_iters and  np.linalg.norm(grad) > threshold
             
-        if debug_mode and n_iter % 100 == 0:
+        if debug_mode and n_iter % max_iters == 0:
         
             # norm of the grad
             print('n_iter:', n_iter, ', ||grad|| =', np.linalg.norm(grad))
@@ -114,7 +114,7 @@ def least_squares_SGD(y, tx, initial_w, max_iters, gamma, batch_size, threshold=
         n_iter = n_iter + 1
         continue_ = n_iter < max_iters and  np.linalg.norm(grad) > threshold
             
-        if debug_mode and n_iter % 100 == 0:
+        if debug_mode and n_iter % max_iters == 0:
         
             # norm of the grad
             print('n_iter:', n_iter, ', ||grad|| =', np.linalg.norm(grad))
@@ -180,7 +180,7 @@ def logistic_regression(y, tx, initial_w, max_iters, gamma, method, threshold=1e
         n_iter = n_iter + 1
         continue_ = n_iter < max_iters and  np.linalg.norm(grad) > threshold
             
-        if debug_mode and n_iter % 100 == 0:
+        if debug_mode and n_iter % max_iters == 0:
         
             # norm of the grad
             print('n_iter:', n_iter, ', ||grad|| =', np.linalg.norm(grad))
@@ -246,7 +246,7 @@ def reg_logistic_regression(y, tx, initial_w, max_iters, gamma, method, lambda_,
         n_iter = n_iter + 1
         continue_ = n_iter < max_iters and  np.linalg.norm(grad) > threshold
             
-        if debug_mode and n_iter % 100 == 0:
+        if debug_mode and n_iter % max_iters == 0:
         
             # norm of the grad
             print('n_iter:', n_iter, ', ||grad|| =', np.linalg.norm(grad))
