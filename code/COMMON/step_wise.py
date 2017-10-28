@@ -18,7 +18,8 @@ def results_r2_stepwise(list_r2_adj, indices_features):
         
     print("-------------------------------------------------------")
     print("Number of features chosen:", len(indices_features))
-    print("Indices of features chosen: ", indices_features, '\n')
+    print("Indices of features chosen: ", indices_features)
+
     
 def stepwise(model, R2_method, all_candidates, features, y_true, cv):
     
@@ -30,14 +31,10 @@ def stepwise(model, R2_method, all_candidates, features, y_true, cv):
     whose inclusion gives the most statistically significant improvement of the fit, and repeating 
     this process until none improves the model to a statistically significant extent.    
     """
-    
     # data set sizes
     numSamples = all_candidates.shape[0]
     numFeat = all_candidates.shape[1]
     
-    print('Number of input features (all the candidates):', str(numFeat))
-    print('Number samples:', str(numSamples))
-
     # offset
     H = np.ones((numSamples,1)) 
 
@@ -121,7 +118,7 @@ def stepwise(model, R2_method, all_candidates, features, y_true, cv):
                 elif model['method']== 'lsgd':
                     
                     initial_w = np.ones(X.shape[1])
-                    ws,_ = least_squares_GD(y_true,X, initial_w, model['max_iters'], model['gamma'], model['threshold'],
+                    ws_tot,_ = least_squares_GD(y_true,X, initial_w, model['max_iters'], model['gamma'], model['threshold'],
                                                 model['debug_mode'])
                     ws = ws_tot[-1]
 
@@ -185,8 +182,8 @@ def stepwise(model, R2_method, all_candidates, features, y_true, cv):
             H = np.concatenate((H, all_candidates[:,ind_max].reshape(numSamples,1)), axis = 1)
             all_candidates = np.delete(all_candidates,ind_max,1)
             
-            print('-------------------------------------------------')
-            print('Feature chosen: ', features[ind_max][1], '(index :', features[ind_max][0], ')')
+            print('--------------------------------------------------------------------------------------------')
+            print('Feature chosen: ', features[ind_max][1], '(index :', features[ind_max][0], ') |', ' R2adj = ', R2adj_chosen)
             idx_features.append(features[ind_max][0])
             #deleting the feature chosen in order not to have the combination with the same features
             del(features[ind_max])
