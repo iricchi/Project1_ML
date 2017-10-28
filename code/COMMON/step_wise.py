@@ -182,8 +182,8 @@ def stepwise(model, R2_method, all_candidates, features, y_true, cv):
             H = np.concatenate((H, all_candidates[:,ind_max].reshape(numSamples,1)), axis = 1)
             all_candidates = np.delete(all_candidates,ind_max,1)
             
-            print('-------------------------------------------------')
-            print('Feature chosen: ', features[ind_max][1], '(index :', features[ind_max][0], ')')
+            print('--------------------------------------------------------------------------------------------')
+            print('Feature chosen: ', features[ind_max][1], '(index :', features[ind_max][0], ') |', ' R2adj = ', R2adj_chosen)
             idx_features.append(features[ind_max][0])
             #deleting the feature chosen in order not to have the combination with the same features
             del(features[ind_max])
