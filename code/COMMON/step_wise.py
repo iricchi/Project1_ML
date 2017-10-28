@@ -18,7 +18,8 @@ def results_r2_stepwise(list_r2_adj, indices_features):
         
     print("-------------------------------------------------------")
     print("Number of features chosen:", len(indices_features))
-    print("Indices of features chosen: ", indices_features, '\n')
+    print("Indices of features chosen: ", indices_features)
+
     
 def stepwise(model, R2_method, all_candidates, features, y_true, cv):
     
@@ -30,14 +31,10 @@ def stepwise(model, R2_method, all_candidates, features, y_true, cv):
     whose inclusion gives the most statistically significant improvement of the fit, and repeating 
     this process until none improves the model to a statistically significant extent.    
     """
-    
     # data set sizes
     numSamples = all_candidates.shape[0]
     numFeat = all_candidates.shape[1]
     
-    print('Number of input features (all the candidates):', str(numFeat))
-    print('Number samples:', str(numSamples))
-
     # offset
     H = np.ones((numSamples,1)) 
 
@@ -121,7 +118,7 @@ def stepwise(model, R2_method, all_candidates, features, y_true, cv):
                 elif model['method']== 'lsgd':
                     
                     initial_w = np.ones(X.shape[1])
-                    ws,_ = least_squares_GD(y_true,X, initial_w, model['max_iters'], model['gamma'], model['threshold'],
+                    ws_tot,_ = least_squares_GD(y_true,X, initial_w, model['max_iters'], model['gamma'], model['threshold'],
                                                 model['debug_mode'])
                     ws = ws_tot[-1]
 
