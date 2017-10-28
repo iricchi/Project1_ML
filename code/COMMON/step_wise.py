@@ -43,49 +43,70 @@ def stepwise(model, R2_method, all_candidates, features, y_true, cv):
     # k = number of features chosen, used to comput R2 adjusted
     k = 0
     
-    # fit with the offset
-    if model['method'] == 'ls':
+    if cv == 0:
+
+        # fit with the offset (no cross validation)
+        if model['method'] == 'ls':
+
+            w0, loss = least_squares(y_true,X)
+            loglike0 = compute_loglikelihood_reg(y_true,X,w0)
+            loglike0 = loglike0/numSamples
+
+        elif model['method'] == 'rr':
+
+            w0, loss = ridge_regression(y_true,X,0)  # initialize with lambda = 0  
+            loglike0 = compute_loglikelihood_reg(y_true,X,w0)
+            loglike0 = loglike0/numSamples
+
+        elif model['method'] == 'lsgd':
+
+            initial_w = np.ones(X.shape[1])
+            w0, loss = least_squares_GD(y_true,X, initial_w, model['max_iters'], model['gamma'], model['threshold'],
+                                        model['debug_mode'])
+            loglike0 = compute_loglikelihood_reg(y_true, X, w0[-1])
+            loglike0 = loglike0/numSamples
+
+        elif model['method'] == 'lssgd':
+
+            initial_w = np.ones(X.shape[1])
+            w0, loss = least_squares_SGD(y_true,X, initial_w, model['max_iters'], model['gamma'], model['batch_size'],
+                                         model['threshold'], model['debug_mode'])
+            loglike0 = compute_loglikelihood_reg(y_true, X, w0[-1])
+            loglike0 = loglike0/numSamples
+
+        elif model['method'] == 'lr':
+
+            initial_w = np.ones(X.shape[1])
+            w0, loss = logistic_regression(y_true,X, initial_w, model['max_iters'], model['gamma'], model['method_minimization'],
+                                           model['threshold'], model['debug_mode'])
+            loglike0 = compute_loglikelihood_reg(y_true, X, w0[-1])
+            loglike0 = loglike0/numSamples
+
+        elif model['method'] == 'lrr':
+
+            initial_w = np.ones(X.shape[1])
+            w0, loss = reg_logistic_regression(y_true,X, initial_w, model['max_iters'], model['gamma'], model['method_minimization'],
+                                            model['lambda_'], model['threshold'], model['debug_mode'])
+            loglike0 = compute_loglikelihood_reg(y_true, X, w0[-1])
+            loglike0 = loglike0/numSamples
+
+        else:
+            print('No correct type of model specified')
+
+    elif cv == 1:
         
-        w0, loss = least_squares(y_true,X)
-        loglike0 = compute_loglikelihood_reg(y_true,X,w0)
-        
-    elif model['method'] == 'rr':
-        
-        w0, loss = ridge_regression(y_true,X,0)  # initialize with lambda = 0  
-        loglike0 = compute_loglikelihood_reg(y_true,X,w0)
-        
-    elif model['method'] == 'lsgd':
-        
-        initial_w = np.ones(X.shape[1])
-        w0, loss = least_squares_GD(y_true,X, initial_w, model['max_iters'], model['gamma'], model['threshold'],
-                                    model['debug_mode'])
-        loglike0 = compute_loglikelihood_reg(y_true, X, w0[-1])
-        
-    elif model['method'] == 'lssgd':
-        
-        initial_w = np.ones(X.shape[1])
-        w0, loss = least_squares_SGD(y_true,X, initial_w, model['max_iters'], model['gamma'], model['batch_size'],
-                                     model['threshold'], model['debug_mode'])
-        loglike0 = compute_loglikelihood_reg(y_true, X, w0[-1])
-        
-    elif model['method'] == 'lr':
-        
-        initial_w = np.ones(X.shape[1])
-        w0, loss = logistic_regression(y_true,X, initial_w, model['max_iters'], model['gamma'], model['method_minimization'],
-                                       model['threshold'], model['debug_mode'])
-        loglike0 = compute_loglikelihood_reg(y_true, X, w0[-1])
-        
-    elif model['method'] == 'lrr':
-        
-        initial_w = np.ones(X.shape[1])
-        w0, loss = reg_logistic_regression(y_true,X, initial_w, model['max_iters'], model['gamma'], model['method_minimization'],
-                                        model['lambda_'], model['threshold'], model['debug_mode'])
-        loglike0 = compute_loglikelihood_reg(y_true, X, w0[-1])
+        # fit with the offset (with cross validation)
+        model['initial_w'] = np.ones(X.shape[1])
+        w_tr_tot, loss_tr_tot, loss_te_tot, success_rate  = cross_validation(y_true, X, model)
+        loglike0 = np.mean(loss_te_tot)
+        loglike0 = loglike0/(numSamples/model['k_fold'])
         
     else:
-        print('No correct type of model specified')
-               
-
+        
+        print('No cross validation specified: cv = 0 or 1') 
+    
+    print('cv:', cv, 'L0:', loglike0) 
+    
     #fix the R2adj_max
     R2 = 0             # definition : R2 = 1 - loglike0/loglike0 = 1 - 1
     R2adj_0 = R2               
@@ -150,6 +171,7 @@ def stepwise(model, R2_method, all_candidates, features, y_true, cv):
                     
                 # compute R-squared McFadden
                 loglike = compute_loglikelihood_reg(y_true,X,ws)
+                loglike = loglike/numSamples
                 R2 = 1-(loglike/loglike0)
 
             elif cv == 1:
@@ -158,6 +180,7 @@ def stepwise(model, R2_method, all_candidates, features, y_true, cv):
                 model['initial_w'] = np.ones(X.shape[1])
                 w_tr_tot, loss_tr_tot, loss_te_tot, success_rate  = cross_validation(y_true, X, model)
                 loss = np.mean(loss_te_tot)
+                loss = loss/(numSamples/model['k_fold'])
                 
                 # compute R-squared McFadden 
                 R2 = 1-(loss/loglike0)
@@ -168,12 +191,14 @@ def stepwise(model, R2_method, all_candidates, features, y_true, cv):
                 
             # correction depending on the number of features and of samples   
             R2_adj.append(R2 - (k/(numSamples-k-1)*(1-R2)))
-            
+                
         # take the best R2   
         R2adj_chosen = np.max(R2_adj)
         best_R2adj.append(R2adj_chosen)
         idx_chosen = np.argmax(R2_adj)
 
+        print('R2adj_chosen:', R2adj_chosen)
+        
         if R2adj_chosen > R2adj_max:
             
             R2adj_max = R2adj_chosen
