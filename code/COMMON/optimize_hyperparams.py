@@ -2,6 +2,7 @@ from plots import *
 from cross_validation import *
 import matplotlib.pyplot as plt
 from build_poly import build_poly
+from standard import standardize
 
 def optimize_lambda(y, x, lambda_min, lambda_max, lambda_steps, args, debug_mode=0):
     """Optimization of the hyper-parameter lambda_ driving regularization. The best lambda_ is chosen
@@ -81,6 +82,10 @@ def optimize_degree(y, x, degree_min, degree_max, degree_steps, args, debug_mode
 
         # build polynomial basis function
         phi = build_poly(x, degree_tmp)
+        
+        # standardization
+        phi_tmp,_,_ =  standardize(phi[:,1:]) 
+        phi[:,1:] = phi_tmp
         
         # update initial weights 
         args['initial_w'] = np.zeros(phi.shape[1]) 
