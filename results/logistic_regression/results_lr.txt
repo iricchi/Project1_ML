@@ -7,3 +7,10 @@ number of features chosen = 31
 index = [1, 13, 4, 46, 0, 11, 44, 43, 7, 2, 16, 48, 10, 6, 49, 22, 45, 12, 19, 23, 32, 24, 17, 14, 39, 42, 30, 31, 47, 38, 20]
 
 2) degree optimization
+extract the 10 first features [1, 13, 4, 46, 0, 11, 44, 43, 7, 2]
+gamma = 1e-5, threshold = 250, max_iters = 1000
+tested degrees = [ 1  2  3  4  5  6  7  8  9 10] 
+
+
+
+w_opt saved in folder TOM as 'w_opt_lr.npy' or 'w_opt_lr_17.npy'
