@@ -22,6 +22,7 @@ def extend_features(X, feature_names, degree, is_add_log = False, index_log = [0
     # adding 16 features (momentum)
     if new_feat :
         
+        # compute new features
         features_4 = X[:,[13,16,23,26]]
         eta_angles = X[:, [14,17,24,27]]
         phi_angles = X[:,[15,18,25,28]]        
@@ -31,7 +32,6 @@ def extend_features(X, feature_names, degree, is_add_log = False, index_log = [0
         P_mom_comp3 = features_4*np.sin(eta_angles)
         P_mom_mod = features_4*np.cosh(eta_angles)
     
-
         names = ['PRI_tau_pt_mom_comp1', 'PRI_lep_pt_mom_comp1', 'PRI_jet_leading_pt_mom_comp1',
                  'PRI_jet_subleading_pt_mom_comp1', 'PRI_tau_pt_mom_comp2', 'PRI_lep_pt_mom_comp2',
                  'PRI_jet_leading_pt_mom_comp2', 'PRI_jet_subleading_pt_mom_comp2', 'PRI_tau_pt_mom_comp3',
@@ -40,6 +40,8 @@ def extend_features(X, feature_names, degree, is_add_log = False, index_log = [0
                  'PRI_jet_subleading_pt_mom_module']
         
         for i in range(len(names)):
+
+            # add new feature names
             features_names_ext.append(names[i])
             
         X_ext = np.concatenate((X_ext, P_mom_comp1), axis = 1)

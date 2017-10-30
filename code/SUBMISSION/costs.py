@@ -4,7 +4,7 @@ from sigmoid import sigmoid
 """Functions used to compute the loss."""
 
 def compute_mse_reg(y, tx, w, lambda_=0):
-    """Calculate the cost using mean squared error (mse), regularized when lambda_>0."""
+    """Calculate the cost which is the mean squared error (mse), regularized when lambda_>0."""
    
     # number of samples
     N = len(y)
@@ -21,7 +21,7 @@ def compute_mse_reg(y, tx, w, lambda_=0):
     return mes_reg
 
 def compute_mae_reg(y, tx, w, lambda_=0):
-    """Calculate the cost using mean absolute error (mae), regularized when lambda_>0."""
+    """Calculate the cost which is the mean absolute error (mae), regularized when lambda_>0."""
    
     # number of samples
     N = len(y)
@@ -39,7 +39,9 @@ def compute_mae_reg(y, tx, w, lambda_=0):
 
 
 def compute_loglikelihood_reg(y, tx, w, lambda_=0):
-    #y[np.where(y ==-1)] = 0
+    """Caluculate the cost  which is the log likelihood, regularized when lambda_>0 """
+    
+    # log-likelihood 
     loglikelihood = np.sum(np.log(1+np.exp(tx.dot(w))) - y*(tx.dot(w))) + lambda_*w.T.dot(w)
     
     return loglikelihood

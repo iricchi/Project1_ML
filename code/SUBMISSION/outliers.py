@@ -1,16 +1,17 @@
 import numpy as np
 
 """
-Set delete to 1 if you want to delete samples with -999 from the dataset,
-Set delete to 0 if you want to substitude -999 with 0,
+Set delete to 1 or True if you want to delete samples with -999 from the dataset,
+Set delete to 0 or False if you want to substitude -999 with 0,
 Set delete to 'mean' if you want to substitude -999 with the mean
 Set delete to 'median' if you want to substitude -999 with the median
 """
+
 def handle_outliers(input_data, yb, outlier_value, delete):
     
     X = input_data
 
-    if delete==1:
+    if delete == True:
         
         print('samples with -999 are removed from the dataset ')
         
@@ -21,7 +22,7 @@ def handle_outliers(input_data, yb, outlier_value, delete):
             X = np.delete(X, del_idx, 0)      
             Y = np.delete(Y, del_idx, 0)
         
-    elif delete==0:
+    elif delete == False:
         
         print('-999 are replaced by 0')
         

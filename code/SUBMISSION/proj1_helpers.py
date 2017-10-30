@@ -24,7 +24,10 @@ def load_csv_data(data_path, sub_sample=False):
     return yb, input_data, ids
 
 def predict_labels(weights, data):
-    """Generates class predictions given weights, and a test data matrix"""
+    """Prediction of the classes for each data samples given weights. The labels in the training dataset are assumed to be 0 or 1.
+    Prediction is done thanks to thresholding at 0.5. For example, giving a sample x of data x is assigned to class 1 one if x*weights
+    is above 0.5."""
+    
     y_pred = np.dot(data, weights)
     y_pred[np.where(y_pred <= 0.5)] = 0
     y_pred[np.where(y_pred > 0.5)] = 1
@@ -32,7 +35,10 @@ def predict_labels(weights, data):
     return y_pred
 
 def predict_labels_log(weights, data):
-    """Generates class predictions given weights, and a test data matrix"""
+    """Prediction of the classes for each data samples given weights. The labels in the training dataset are assumed to be 0 or 1.
+    Prediction is done thanks to thresholding at 0.5. For example, giving a sample x of data x is assigned to class 1 one if
+    sigmoid(x*weights)is above 0.5."""
+    
     y_pred = sigmoid(np.dot(data, weights))
     y_pred[np.where(y_pred <= 0.5)] = 0
     y_pred[np.where(y_pred > 0.5)] = 1

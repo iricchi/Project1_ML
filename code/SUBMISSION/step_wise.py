@@ -3,7 +3,6 @@ import matplotlib.pyplot as plt
 from proj1_helpers import load_csv_data, predict_labels 
 from implementations import *
 from outliers import handle_outliers
-from labels import idx_2labels
 from standard import standardize
 from split_data import split_data
 from optimize_hyperparams import *
@@ -104,9 +103,7 @@ def stepwise(model, R2_method, all_candidates, features, y_true, cv):
     else:
         
         print('No cross validation specified: cv = 0 or 1') 
-    
-    print('cv:', cv, 'L0:', loglike0) 
-    
+        
     #fix the R2adj_max
     R2 = 0             # definition : R2 = 1 - loglike0/loglike0 = 1 - 1
     R2adj_0 = R2               
@@ -196,20 +193,22 @@ def stepwise(model, R2_method, all_candidates, features, y_true, cv):
         R2adj_chosen = np.max(R2_adj)
         best_R2adj.append(R2adj_chosen)
         idx_chosen = np.argmax(R2_adj)
-
-        print('R2adj_chosen:', R2adj_chosen)
         
         if R2adj_chosen > R2adj_max:
             
+            # update
             R2adj_max = R2adj_chosen
             ind_max = idx_chosen
+            
             # realloc of H with the regressor chosen so that X will be build with the new H and another potential candidate
             H = np.concatenate((H, all_candidates[:,ind_max].reshape(numSamples,1)), axis = 1)
             all_candidates = np.delete(all_candidates,ind_max,1)
             
             print('--------------------------------------------------------------------------------------------')
             print('Feature chosen: ', features[ind_max][1], '(index :', features[ind_max][0], ') |', ' R2adj = ', R2adj_chosen)
+            
             idx_features.append(features[ind_max][0])
+            
             #deleting the feature chosen in order not to have the combination with the same features
             del(features[ind_max])
             del(X)

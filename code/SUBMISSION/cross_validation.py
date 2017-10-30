@@ -92,7 +92,7 @@ def cross_validation_k(y, X, k_indices, k, args):
         loss_tr = compute_loglikelihood_reg(y_tr, X_tr, w_tr, lambda_)
         loss_te = compute_loglikelihood_reg(y_te, X_te, w_tr, lambda_)
         
-    #compute success rateo
+    #compute success rateo (=classification error)
     if args['method'] == 'lr' or args['method'] == 'lrr':
         y_model = predict_labels_log(w_tr, X_te)
     else:
@@ -123,7 +123,7 @@ def cross_validation(y, X, args, debug_mode=0):
 
     # build k folds of indices 
     num_samples = y.shape[0]
-    k_indices = build_k_indices(num_samples, args['k_fold'], debug_mode=debug_mode)
+    k_indices = build_k_indices(num_samples, args['k_fold'], debug_mode=0)
     
     # cross validation
     for k in range(args['k_fold']):        
@@ -136,9 +136,5 @@ def cross_validation(y, X, args, debug_mode=0):
         loss_tr_tot.append(loss_tr_k)
         loss_te_tot.append(loss_te_k)
         success_rate_tot.append(success_rate)
-
-    if debug_mode:
-        print('Mean training loss: ', np.mean(loss_tr_tot))
-        print('Mean testing loss: ', np.mean(loss_te_tot))
 
     return w_tr_tot, loss_tr_tot, loss_te_tot, np.mean(success_rate_tot)
