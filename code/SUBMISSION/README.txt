@@ -1,1 +1,1 @@
-* Data analysis and prediction models for the Higgs boson Machine Learning Challenge
+Data analysis and prediction models for the Higgs boson Machine Learning Challenge
