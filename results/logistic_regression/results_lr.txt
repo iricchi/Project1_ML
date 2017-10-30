@@ -11,6 +11,20 @@ extract the 10 first features [1, 13, 4, 46, 0, 11, 44, 43, 7, 2]
 gamma = 1e-5, threshold = 250, max_iters = 1000
 tested degrees = [ 1  2  3  4  5  6  7  8  9 10] 
 
+3) training / test 
+
+model['method_minimization'] = 'gd' # 'gd' (gradient_descent) or 'newton' (newton descent leads to non invertible matrice "S" which is too big)
+model['threshold'] = 500
+model['gamma'] = 1e-6
+model['initial_w'] = np.zeros(phi.shape[1])
+model['max_iters'] = 10000
+model['debug_mode'] = 1
+model['k_fold'] = 5
+
+training losses: mean = 87299.4333971 ,standard deviation = 133.824819551
+testing losses: mean = 21911.3668556 ,standard deviation = 118.528611483
+success rate = 0.800844
+
 
 
 w_opt saved in folder TOM as 'w_opt_lr.npy' or 'w_opt_lr_17.npy'
