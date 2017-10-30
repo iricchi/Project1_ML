@@ -54,7 +54,7 @@ def least_squares_GD(y, tx, initial_w, max_iters, gamma):
         # check for stopping criteria
         n_iter = n_iter + 1
             
-    return w_tot, loss_tot
+    return w_tot[-1], loss_tot[-1]
     
 def least_squares_SGD(y, tx, initial_w, max_iters, gamma, batch_size):
     """ Stochastic gradient descent algorithm. """
@@ -91,7 +91,7 @@ def least_squares_SGD(y, tx, initial_w, max_iters, gamma, batch_size):
         
         n_iter = n_iter + 1
             
-    return w_tot, loss_tot
+    return w_tot[-1], loss_tot[-1]
 
 def logistic_regression(y, tx, initial_w, max_iters, gamma):
     """ Minimization of the likelihood through gradient descent (method = 'gd' or Newton method (method = 'newton'). """
@@ -122,7 +122,7 @@ def logistic_regression(y, tx, initial_w, max_iters, gamma):
         n_iter = n_iter + 1
             
                        
-    return w_tot, loss_tot
+    return w_tot[-1], loss_tot[-1]
 
 def reg_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma):
     """ Minimization of the regularized likelihood through gradient descent (method = 'gd' or Newton method (method = 'newton'). """
@@ -150,4 +150,4 @@ def reg_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma):
         
         n_iter = n_iter + 1
             
-    return w_tot, loss_tot
+    return w_tot[-1], loss_tot[-1]
