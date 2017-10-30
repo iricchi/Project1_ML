@@ -1,7 +1,7 @@
 import numpy as np 
 import matplotlib.pyplot as plt
 from proj1_helpers import load_csv_data, predict_labels 
-from implementations import *
+from implementations_enhanced import *
 from outliers import handle_outliers
 from standard import standardize
 from split_data import split_data

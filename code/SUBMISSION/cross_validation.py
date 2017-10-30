@@ -1,5 +1,5 @@
 import numpy as np
-from implementations import *
+from implementations_enhanced import *
 from proj1_helpers import *
 from sigmoid import *
 
