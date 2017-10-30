@@ -30,10 +30,10 @@ We implemented various important functions to test our ideas, here are explained
 	Here is implemented the standard cross-validation algorithm as seen in the labs, the function works with all the models and take as input a dictonary (args) containing all the infos concerning
 	the model to use, we implemented the possibility to output three different losses: rmse, mae, loglikelyhood.
 	
-3) 'implementation_enhanced.py' and 'implementations.py':
+3)'implementation_enhanced.py' and 'implementations.py':
 	In implementations.py are present the 6 functions requested from the project, instead implementations_enhanced.py is the file we use in our project, we basically added a stopping 
 	criteria for the descent methods in order to speed them up.
 	
-4) 'optimize_hyperparams.py':
+4)'optimize_hyperparams.py':
 	Here are present funcitons that implements the opimization loops for the hyperparameters lambda, degree and gamma(although never used the last one). The loop checks the efficacy of each
 	value of hyperparameter with the others through cross-validation. The final result is a list of all the results from the cross-validations and the oprimal hyperparameter chosen.
