@@ -62,13 +62,7 @@ def extend_features(X, feature_names, degree, is_add_log = False, index_log = [0
             features_names_ext.append(log_names[i])
        
         print(str(len(index_log)), 'logarithmic features have been added.')
-
-   # standardize the data
-    X_ext,_ ,_ = standardize(X_ext) 
-    
-    print('Data have been standardized.')
-    print('---------------------------')
-
+        
     # list of feature names and indices
     features_ext = []
     for i in range(len(features_names_ext)):
